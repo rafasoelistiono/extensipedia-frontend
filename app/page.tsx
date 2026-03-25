@@ -1,65 +1,237 @@
-import Image from "next/image";
+import {
+  BriefcaseBusiness,
+  BookCopy,
+  Funnel,
+  Megaphone,
+  Trophy,
+} from "lucide-react";
+import { About } from "@/components/About";
+import { AspirasiCard } from "@/components/AspirasiCard";
+import { EventCard } from "@/components/EventCard";
+import { Features, type FeatureItem } from "@/components/Features";
+import { Footer } from "@/components/Footer";
+import { Hero } from "@/components/Hero";
+import { Navbar } from "@/components/Navbar";
+import { ScrollReset } from "@/components/ScrollReset";
+import { Button } from "@/components/ui/Button";
+
+const featureItems: FeatureItem[] = [
+  {
+    icon: BookCopy,
+    title: "Bahan Kuliah & Bank Soal",
+    description:
+      "Repository lengkap bahan kuliah, slide, dan bank soal untuk semua semester.",
+    details: [
+      "Akutansi & Manajemen",
+      "Kalender Akademik",
+      "Canva & Gemini Access",
+    ],
+    action: "Akses Sekarang",
+    href: "/akademik",
+    outlined: true,
+  },
+  {
+    icon: Trophy,
+    title: "Kompetisi & Seminar",
+    description:
+      "Info lomba, workshop, dan webinar terbaru untuk pengembangan diri.",
+    details: ["Info Kompetisi", "Info Pelatihan"],
+    action: "Eksplorasi",
+    href: "/kompetensi-karir",
+    highlighted: true,
+  },
+  {
+    icon: BriefcaseBusiness,
+    title: "Karir & Networking",
+    description:
+      "Template CV, platform karir, dan resource library untuk akselerasi karirmu.",
+    details: ["CV & Cover Letter", "Platform Karir"],
+    action: "Lihat Resource",
+    href: "/karir",
+  },
+  {
+    icon: Megaphone,
+    title: "Layanan Aspirasi",
+    description:
+      "Sampaikan aspirasimu dan lihat status tiket pengaduan secara transparan.",
+    details: ["Jaring Aspirasi", "Tracking Tiket"],
+    action: "Sampaikan Aspirasi",
+    href: "/advokasi",
+  },
+];
+
+const events = [
+  {
+    title: "National Business Case Competition 2026",
+    date: "5 Mar 2026",
+    tag: "Lomba",
+    subtitle: "BEM FE UI - Mixed - Offline",
+    tone: "primary" as const,
+  },
+  {
+    title: "Workshop Financial Modeling & Value",
+    date: "10 Mar 2026",
+    tag: "Workshop",
+    subtitle: "Student Lab UI - Hybrid - Limited",
+    tone: "sky" as const,
+  },
+  {
+    title: "ASEAN Entrepreneurship Summit 2026",
+    date: "14 Mar 2026",
+    tag: "Seminar",
+    subtitle: "ASEAN Forum - Regional Event",
+    tone: "teal" as const,
+  },
+];
+
+const aspirations = [
+  {
+    id: "home-1",
+    title: "Perspicitatis esse molestiae vel qui.",
+    description:
+      "Quasi quo sit suscipit tempora aperiam rerum placeat id. Voluptatem praesentium excepturi id. Repudiandae incidunt doloremque. Error est at ullam.",
+    user: "Anonim",
+  },
+  {
+    id: "home-2",
+    title: "Perspicitatis esse molestiae vel qui.",
+    description:
+      "Quasi quo sit suscipit tempora aperiam rerum placeat id. Voluptatem praesentium excepturi id. Repudiandae incidunt doloremque. Error est at ullam.",
+    user: "Dimasukkan oleh : Lorem Ipsum",
+  },
+  {
+    id: "home-3",
+    title: "Perspicitatis esse molestiae vel qui.",
+    description:
+      "Quasi quo sit suscipit tempora aperiam rerum placeat id. Voluptatem praesentium excepturi id. Repudiandae incidunt doloremque. Error est at ullam.",
+    user: "Anonim",
+  },
+  {
+    id: "home-4",
+    title: "Perspicitatis esse molestiae vel qui.",
+    description:
+      "Quasi quo sit suscipit tempora aperiam rerum placeat id. Voluptatem praesentium excepturi id. Repudiandae incidunt doloremque. Error est at ullam.",
+    user: "Dimasukkan oleh : Lorem Ipsum",
+    featured: true,
+    evidenceImage: "/hero-campus.jpg",
+  },
+];
 
 export default function Home() {
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
+    <div className="min-h-screen bg-base-white text-primary">
+      <ScrollReset />
+      <Navbar />
+      <Hero />
+
+      <About
+        title="Tentang Gema Cita Bersama"
+        description="BEM PE FEB UI Kabinet Gema Cita Bersama hadir sebagai wadah kolaboratif yang didedikasikan untuk memperjuangkan aspirasi dan mendukung penuh perjalanan akademik mahasiswa Ekstensi. Kami percaya bahwa setiap mahasiswa memiliki potensi besar yang harus diwujudkan melalui akses informasi yang transparan dan inklusif."
+      />
+
+      <Features items={featureItems} />
+
+      <section
+        id="kompetisi-karir"
+        className="bg-base-white"
+      >
+        <div className="mx-auto w-full max-w-[1180px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 className="section-title text-[26px] leading-none sm:text-[30px] lg:text-[36px]">
+                Update Terbaru
+              </h2>
+              <p className="section-subtitle mt-2">
+                Kompetisi & Seminar Pilihan
+              </p>
+            </div>
+
             <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              href="/kompetensi-karir"
+              className="font-tagline text-sm font-semibold text-primary transition hover:text-cta"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              Lihat Semua
+            </a>
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            {events.map((event) => (
+              <EventCard key={event.title} {...event} />
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section id="aspirasi" className="bg-base-white py-12 sm:py-16 lg:py-20">
+        <div className="mx-auto w-full max-w-[1180px] px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="section-eyebrow">Aspirasi Mahasiswa</div>
+            <h2 className="section-title mt-2 text-[28px] leading-none sm:text-[32px] lg:text-[38px]">
+              Jaring Aspirasi
+            </h2>
+          </div>
+
+          <div className="muted-copy mt-6 flex flex-wrap items-center gap-2 text-[12px] sm:gap-3">
+            <span className="inline-flex items-center gap-2">
+              <Funnel className="h-4 w-4" />
+              Publikasi:
+            </span>
+
+            {["Semua", "Publik", "Anonim"].map((filter, index) => (
+              <button
+                key={filter}
+                type="button"
+                className={[
+                  "font-tagline rounded-full px-3 py-1.5 text-xs transition sm:px-4",
+                  index === 0 ? "pill-tab-active" : "pill-tab",
+                ].join(" ")}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {aspirations.map((item) => (
+              <AspirasiCard key={item.id} {...item} />
+            ))}
+          </div>
         </div>
-      </main>
+      </section>
+
+      <section className="bg-surface-muted py-10 sm:py-14">
+        <div className="mx-auto w-full max-w-[1180px] px-4 sm:px-6 lg:px-8">
+          <div className="surface-card mx-auto max-w-[720px] rounded-[16px] p-5 sm:p-6">
+            <h2 className="section-title flex items-center gap-2 text-[24px] leading-tight sm:text-[28px]">
+              <span className="text-cta">⌕</span>
+              Cek Status Aspirasi
+            </h2>
+
+            <p className="muted-copy mt-2 text-[13px] leading-6 sm:text-sm">
+              Masukkan ID Tiket untuk melihat status terkini pengaduan atau
+              aspirasi Anda.
+            </p>
+
+            <div className="mt-4 flex flex-col gap-3">
+              <input
+                type="text"
+                placeholder="ID Tiket (Contoh: ASP-2026-XXXX)"
+                className="input-base h-[44px] rounded-xl px-4 text-[13px] outline-none placeholder:text-[13px]"
+              />
+
+              <Button
+                variant="secondary"
+                className="h-[44px] w-full justify-center rounded-xl px-4 text-[13px]"
+              >
+                Lacak
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
 }

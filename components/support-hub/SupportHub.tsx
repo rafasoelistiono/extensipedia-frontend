@@ -1,0 +1,397 @@
+import Link from "next/link";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BadgeAlert,
+  BriefcaseBusiness,
+  ChevronDown,
+  FileSpreadsheet,
+  Megaphone,
+  MessageCircleMore,
+  Search,
+  ShieldCheck,
+  Ticket,
+} from "lucide-react";
+import { AspirasiCard } from "@/components/AspirasiCard";
+import { BreadcrumbTrail } from "@/components/BreadcrumbTrail";
+import { AspirationSubmitForm } from "@/components/support-hub/AspirationSubmitForm";
+import { Button } from "@/components/ui/Button";
+import type { FeaturedAspiration } from "@/lib/public-api";
+
+type SupportHubProps = {
+  activeTab: "aspirasi" | "lacak";
+  aspirations: FeaturedAspiration[];
+};
+
+const supportHighlights = [
+  {
+    title: "Zero-Friction",
+    description: "Form tanpa login SIAK untuk aksesibilitas 100%",
+    icon: ShieldCheck,
+    iconTone: "bg-[#e5ebee] text-primary",
+  },
+  {
+    title: "Auto Ticket ID",
+    description: "ID tiket otomatis untuk pelacakan transparan",
+    icon: Ticket,
+    iconTone: "bg-[#fbf5e1] text-[#b48a00]",
+  },
+  {
+    title: "5 Status Tracking",
+    description: "Dari Submitted hingga Resolved secara transparan",
+    icon: BadgeAlert,
+    iconTone: "bg-[#f0fdf4] text-[#15803d]",
+  },
+] as const;
+
+const policyResources = [
+  {
+    title: "Siak WAR",
+    description:
+      "Strategi dan tips jitu untuk memenangkan perang pengambilan mata kuliah di SIAK NG.",
+    topTone: "bg-primary",
+    iconTone: "bg-[#4451b4] text-base-white",
+    icon: FileSpreadsheet,
+  },
+  {
+    title: "Cicilan UKT",
+    description:
+      "Prosedur lengkap pengajuan cicilan UKT, syarat dokumen, dan timeline pengajuan.",
+    topTone: "bg-[#0a5a8a]",
+    iconTone: "bg-base-white text-cta",
+    icon: BriefcaseBusiness,
+  },
+  {
+    title: "Alur SKPI",
+    description:
+      "Panduan lengkap pengajuan Surat Keterangan Pendamping Ijazah (SKPI) dan persyaratannya.",
+    topTone: "bg-primary",
+    iconTone: "bg-base-white text-primary",
+    icon: BadgeAlert,
+  },
+] as const;
+
+function HeroTab({
+  href,
+  active,
+  icon: Icon,
+  label,
+}: {
+  href: string;
+  active: boolean;
+  icon: typeof Megaphone;
+  label: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={[
+        "inline-flex h-11 items-center justify-center gap-3 rounded-[18px] border px-4 font-tagline text-[14px] font-semibold transition-all sm:h-14 sm:rounded-[20px] sm:px-6 sm:text-[18px]",
+        active
+          ? "border-cta bg-cta text-primary shadow-[0_8px_22px_rgba(252,194,2,0.28)]"
+          : "border-[#275574] bg-[#275574] !text-base-white shadow-[0_8px_22px_rgba(3,57,93,0.22)] hover:border-[#356583] hover:bg-[#356583] [&_svg]:!text-base-white",
+      ].join(" ")}
+    >
+      <Icon className="h-4 w-4 sm:h-6 sm:w-6" />
+      {label}
+    </Link>
+  );
+}
+
+function SupportInfoCard() {
+  return (
+    <article className="rounded-[20px] border border-base-grey bg-base-white p-5 shadow-[0_4px_17px_rgba(0,0,0,0.12)] sm:p-6">
+      <h3 className="font-headline text-[22px] leading-none text-primary">
+        Tentang Support Hub
+      </h3>
+
+      <div className="mt-5 space-y-4">
+        {supportHighlights.map(({ title, description, icon: Icon, iconTone }) => (
+          <div key={title} className="flex items-start gap-4">
+            <div
+              className={[
+                "flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[14px]",
+                iconTone,
+              ].join(" ")}
+            >
+              <Icon className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="font-tagline text-[16px] font-bold text-primary">{title}</div>
+              <p className="mt-1 text-[14px] leading-6 text-copy-muted">{description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function SupportContactCard() {
+  return (
+    <article className="rounded-[20px] bg-primary p-5 text-base-white shadow-[0_4px_17px_rgba(0,0,0,0.18)] sm:p-6">
+      <h3 className="font-headline text-[22px] leading-none text-base-white">
+        Kontak INADVOK
+      </h3>
+      <p className="mt-4 text-[14px] leading-6 text-base-white/70">
+        Butuh bantuan segera? Hubungi tim Departemen Internal & Advokasi
+        Mahasiswa BEM PE FEB UI.
+      </p>
+
+      <div className="mt-5 space-y-3">
+        <a
+          href="#"
+          className="flex h-10 items-center justify-center gap-2 rounded-[10px] bg-cta px-4 font-tagline text-[14px] font-bold text-primary transition hover:brightness-95"
+        >
+          <MessageCircleMore className="h-4 w-4" />
+          WhatsApp INADVOK
+        </a>
+        <a
+          href="https://www.instagram.com/bempefebui/"
+          target="_blank"
+          rel="noreferrer"
+          className="flex h-10 items-center justify-center gap-2 rounded-[10px] bg-[#1d4d6e] px-4 font-tagline text-[14px] font-bold text-base-white transition hover:bg-[#255c82]"
+        >
+          <Megaphone className="h-4 w-4" />
+          Instagram BEM PE FEB UI
+        </a>
+      </div>
+    </article>
+  );
+}
+
+function PolicyCard({
+  title,
+  description,
+  topTone,
+  iconTone,
+  icon: Icon,
+}: (typeof policyResources)[number]) {
+  return (
+    <article className="overflow-hidden rounded-[20px] border border-base-grey bg-base-white shadow-[0_4px_17px_rgba(0,0,0,0.08)]">
+      <div className={["relative h-[72px]", topTone].join(" ")}>
+        <div
+          className={[
+            "absolute left-6 top-[52px] flex h-[52px] w-[52px] items-center justify-center rounded-[13px] shadow-[0_4px_17px_rgba(0,0,0,0.18)]",
+            iconTone,
+          ].join(" ")}
+        >
+          <Icon className="h-6 w-6" />
+        </div>
+      </div>
+
+      <div className="px-6 pb-8 pt-10">
+        <h3 className="font-headline text-[22px] leading-none text-primary">{title}</h3>
+        <p className="mt-3 text-[14px] leading-6 text-copy-soft">{description}</p>
+        <a
+          href="#"
+          className="mt-5 inline-flex items-center gap-2 font-tagline text-[15px] font-semibold text-primary transition hover:text-cta"
+        >
+          Baca Panduan
+          <ArrowRight className="h-4 w-4" />
+        </a>
+      </div>
+    </article>
+  );
+}
+
+function TicketTracker() {
+  return (
+    <article className="overflow-hidden rounded-[20px] border border-base-grey bg-base-white shadow-[0_4px_17px_rgba(0,0,0,0.16)]">
+      <div className="flex items-center gap-3 bg-primary px-5 py-5 text-base-white sm:px-6">
+        <Ticket className="h-5 w-5 text-cta" />
+        <h3 className="font-headline text-[22px] leading-none text-base-white">
+          Jaring Aspirasi Digital
+        </h3>
+      </div>
+
+      <div className="space-y-5 p-5 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <label className="relative block flex-1">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-copy-soft" />
+            <input
+              type="text"
+              placeholder="ID Tiket (Contoh: ASP-2026-XXXX)"
+              className="input-base h-12 w-full rounded-[10px] pl-11 pr-4 text-[14px] outline-none"
+            />
+          </label>
+
+          <Button
+            variant="secondary"
+            className="h-12 rounded-[10px] px-5 text-[14px] sm:min-w-[88px]"
+          >
+            Lacak
+          </Button>
+        </div>
+
+        <div className="rounded-[20px] border border-[#d0e1ec] bg-[#e8f4fd] p-4 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-copy-soft">
+                ID Tiket
+              </div>
+              <div className="mt-1 font-headline text-[24px] leading-none text-primary">
+                ASP-2026-0042
+              </div>
+              <p className="mt-2 text-[12px] leading-5 text-copy-soft">
+                Kategori: Finansial · Diajukan: 20 Feb 2026
+              </p>
+              <p className="mt-2 font-tagline text-[15px] font-semibold text-primary">
+                Kendala Pengajuan Cicilan UKT Semester Genap
+              </p>
+            </div>
+
+            <span className="inline-flex h-7 items-center justify-center rounded-full bg-cta px-3 font-tagline text-[12px] font-semibold text-primary">
+              Investigating
+            </span>
+          </div>
+
+          <details className="mt-4 overflow-hidden rounded-[10px] bg-[#ffecaf]" open>
+            <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-1.5 font-tagline text-[14px] font-semibold text-primary">
+              Detail Tiket
+              <ChevronDown className="h-4 w-4" />
+            </summary>
+            <div className="p-2 pt-0">
+              <div className="rounded-[12px] bg-base-white px-4 py-3 text-[14px] leading-7 text-black">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+                enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                nisi ut aliquip ex ea commodo consequat.
+              </div>
+            </div>
+          </details>
+
+          <a
+            href="#"
+            className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-[8px] bg-primary px-4 font-tagline text-[14px] font-semibold !text-base-white transition hover:bg-[#0a4c79] [&_svg]:!text-base-white"
+          >
+            Lihat Bukti
+            <ArrowUpRight className="h-4 w-4" />
+          </a>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export function SupportHub({ activeTab, aspirations }: SupportHubProps) {
+  const isTicketTab = activeTab === "lacak";
+
+  return (
+    <main>
+      <section className="relative overflow-hidden bg-primary">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/about/hero-bg.png"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-25"
+        />
+        <div className="page-hero-tint absolute inset-0" />
+        <div className="absolute inset-0 bg-primary/58" />
+
+        <div className="relative mx-auto max-w-[1440px] px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-24 lg:px-8 lg:pb-20">
+          <div className="mx-auto max-w-[1280px]">
+            <BreadcrumbTrail
+              items={[
+                { label: "Beranda", href: "/" },
+                { label: "Kompetensi & Karir", href: "/kompetensi-karir" },
+                { label: isTicketTab ? "Lacak Tiket" : "Sampaikan Aspirasi" },
+              ]}
+            />
+
+            <h1 className="mt-4 font-headline text-[34px] leading-none text-base-white sm:mt-5 sm:text-[56px] lg:text-[64px]">
+              Support Hub
+            </h1>
+
+            <p className="mt-4 max-w-[992px] text-[15px] leading-[1.65] text-[#b4c4cf] sm:text-[20px]">
+              Layanan advokasi dan literasi kebijakan BEM PE FEB UI. Sampaikan
+              aspirasimu atau lacak status tiket pengaduanmu secara transparan.
+            </p>
+
+            <div className="mt-7 flex flex-wrap gap-3 sm:mt-8 sm:gap-4">
+              <HeroTab
+                href="/advokasi"
+                active={!isTicketTab}
+                icon={Megaphone}
+                label="Sampaikan Aspirasi"
+              />
+              <HeroTab
+                href="/advokasi?tab=lacak"
+                active={isTicketTab}
+                icon={Ticket}
+                label="Lacak Tiket"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {!isTicketTab ? (
+        <section className="bg-base-white px-4 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-10 lg:px-8">
+          <div className="mx-auto max-w-[1287px]">
+            <div className="text-center">
+              <div className="section-eyebrow">Aspirasi Mahasiswa</div>
+              <h2 className="section-title mt-2 text-[30px] leading-none sm:text-[42px]">
+                Jaring Aspirasi
+              </h2>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-[12px] sm:mt-8 sm:gap-3">
+              <span className="inline-flex items-center gap-2 text-copy-soft">
+                <BadgeAlert className="h-4 w-4" />
+                Publikasi:
+              </span>
+              {["Semua", "Publik", "Anonim"].map((filter, index) => (
+                <button
+                  key={filter}
+                  type="button"
+                  className={[
+                    "rounded-full px-4 py-1.5 font-tagline text-[13px] transition sm:px-5 sm:text-[14px]",
+                    index === 0 ? "pill-tab-active" : "pill-tab",
+                  ].join(" ")}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2 sm:mt-8">
+              {aspirations.map((item) => (
+                <AspirasiCard key={item.id} {...item} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="bg-base-white px-4 pb-14 pt-4 sm:px-6 sm:pb-16 sm:pt-6 lg:px-8">
+        <div className="mx-auto grid max-w-[1287px] gap-6 lg:grid-cols-[minmax(0,788px)_minmax(0,448px)] lg:items-start">
+          <div>{isTicketTab ? <TicketTracker /> : <AspirationSubmitForm />}</div>
+
+          <div className="space-y-6">
+            <SupportInfoCard />
+            <SupportContactCard />
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-base-white px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
+        <div className="mx-auto max-w-[1287px]">
+          <div className="section-eyebrow">Hak &amp; Prosedur</div>
+          <h2 className="section-title mt-2 text-[30px] leading-none sm:text-[42px]">
+            Advografis &amp; Literasi Kebijakan
+          </h2>
+          <p className="mt-3 text-[15px] leading-7 text-copy-muted sm:text-[20px]">
+            Panduan singkat kebijakan akademik yang wajib kamu tahu
+          </p>
+
+          <div className="mt-8 grid gap-4 lg:grid-cols-3 lg:gap-5">
+            {policyResources.map((resource) => (
+              <PolicyCard key={resource.title} {...resource} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}

@@ -3,11 +3,7 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { ScrollReset } from "@/components/ScrollReset";
 import { SupportHub } from "@/components/support-hub/SupportHub";
-import {
-  fallbackFeaturedAspirations,
-  getFeaturedAspirations,
-  type FeaturedAspiration,
-} from "@/lib/public-api";
+import { getFeaturedAspirations, type FeaturedAspiration } from "@/lib/public-api";
 
 export const metadata: Metadata = {
   title: "Support Hub | Extensipedia",
@@ -27,7 +23,7 @@ export default async function AdvokasiPage({ searchParams }: AdvokasiPageProps) 
   try {
     aspirations = await getFeaturedAspirations();
   } catch {
-    aspirations = fallbackFeaturedAspirations;
+    aspirations = [];
   }
 
   return (

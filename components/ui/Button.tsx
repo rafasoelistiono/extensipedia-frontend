@@ -7,6 +7,7 @@ type ButtonProps = {
   variant?: "primary" | "secondary" | "ghost";
   className?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
 };
 
 export function Button({
@@ -16,6 +17,7 @@ export function Button({
   variant = "primary",
   className = "",
   onClick,
+  disabled = false,
 }: ButtonProps) {
   const classes = [
     "btn-base",
@@ -38,7 +40,12 @@ export function Button({
   }
 
   return (
-    <button type={type} className={classes} onClick={onClick}>
+    <button
+      type={type}
+      className={classes}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {children}
     </button>
   );

@@ -3,9 +3,7 @@ import {
   CalendarClock,
   CalendarDays,
   Download,
-  Palette,
   ShieldAlert,
-  Sparkles,
   Youtube,
 } from "lucide-react";
 import { Footer } from "@/components/Footer";
@@ -14,7 +12,17 @@ import { ScrollReset } from "@/components/ScrollReset";
 import { RepositoryCard } from "@/components/hub-page/RepositoryCard";
 import { HeroBanner } from "@/components/hub-page/HeroBanner";
 import { SectionHeader } from "@/components/about-page/SectionHeader";
-import { getAcademicCountdowns, getAcademicYoutube } from "@/lib/public-api";
+import {
+  getAcademicCountdowns,
+  getAcademicQuickDownloads,
+  getAcademicRepository,
+  getAcademicYoutube,
+  resolveMediaUrl,
+  type AcademicCountdown,
+  type AcademicQuickDownload,
+  type AcademicRepositoryMaterial,
+  type AcademicYoutubeSection,
+} from "@/lib/public-api";
 
 export const metadata: Metadata = {
   title: "Akademik Hub | Extensipedia",
@@ -33,39 +41,98 @@ function getCountdownParts(targetDateTime: string) {
   return { days, hours, minutes, target };
 }
 
+function getCountdownProgress(targetDateTime: string) {
+  const target = new Date(targetDateTime);
+  const now = new Date();
+  const daysLeft = Math.max(
+    0,
+    Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+  );
+
+  if (daysLeft === 0) {
+    return 100;
+  }
+
+  return Math.min(100, Math.max(12, 100 - Math.min(daysLeft, 30) * 3));
+}
+
+function formatTargetDate(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Belum tersedia";
+  }
+
+  return date.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function mapRepositoryItems(items: AcademicRepositoryMaterial[]) {
+  return items
+    .slice()
+    .sort((left, right) => left.display_order - right.display_order)
+    .map((item) => ({
+      id: item.id,
+      title: item.title,
+      href: item.google_drive_link,
+    }));
+}
+
+function getDownloadLabel(item: AcademicQuickDownload) {
+  return item.resource_type === "file" ? "File" : "Link";
+}
+
 export default async function AkademikPage() {
-  let youtubeEmbedUrl: string | null = null;
-  let countdownItem:
-    | {
-        title: string;
-        targetDateTime: string;
-      }
-    | null = null;
+  let youtubeSection: AcademicYoutubeSection | null = null;
+  let countdownItems: AcademicCountdown[] = [];
+  let quickDownloads: AcademicQuickDownload[] = [];
+  let repository: {
+    akuntansi: AcademicRepositoryMaterial[];
+    manajemen: AcademicRepositoryMaterial[];
+  } = {
+    akuntansi: [],
+    manajemen: [],
+  };
 
-  try {
-    const youtubeResponse = await getAcademicYoutube();
-    youtubeEmbedUrl = youtubeResponse.data.embed_url;
-  } catch {
-    youtubeEmbedUrl = null;
+  const [youtubeResult, countdownResult, quickDownloadResult, repositoryResult] =
+    await Promise.allSettled([
+      getAcademicYoutube(),
+      getAcademicCountdowns({ page_size: 10, ordering: "display_order,target_datetime" }),
+      getAcademicQuickDownloads({ page_size: 10, ordering: "display_order,title" }),
+      getAcademicRepository(),
+    ]);
+
+  if (youtubeResult.status === "fulfilled") {
+    youtubeSection = youtubeResult.value.data;
   }
 
-  try {
-    const countdownResponse = await getAcademicCountdowns();
-    const firstItem = countdownResponse.data.items[0];
-
-    if (firstItem) {
-      countdownItem = {
-        title: firstItem.title,
-        targetDateTime: firstItem.target_datetime,
-      };
-    }
-  } catch {
-    countdownItem = null;
+  if (countdownResult.status === "fulfilled") {
+    countdownItems = countdownResult.value.data.items
+      .slice()
+      .sort((left, right) => left.display_order - right.display_order);
   }
 
-  const countdown = countdownItem
-    ? getCountdownParts(countdownItem.targetDateTime)
+  if (quickDownloadResult.status === "fulfilled") {
+    quickDownloads = quickDownloadResult.value.data.items
+      .slice()
+      .sort((left, right) => left.display_order - right.display_order);
+  }
+
+  if (repositoryResult.status === "fulfilled") {
+    repository = repositoryResult.value.data;
+  }
+
+  const featuredCountdown = countdownItems[0] ?? null;
+  const countdown = featuredCountdown
+    ? getCountdownParts(featuredCountdown.target_datetime)
     : null;
+  const progressWidth = featuredCountdown
+    ? getCountdownProgress(featuredCountdown.target_datetime)
+    : 0;
+  const primaryDownload = quickDownloads[0] ?? null;
 
   return (
     <div className="min-h-screen bg-base-white text-primary">
@@ -95,7 +162,7 @@ export default async function AkademikPage() {
                     Countdown
                   </div>
                   <div className="font-tagline text-[18px] text-base-white sm:text-[20px]">
-                    {countdownItem?.title ?? "Event Akademik"}
+                    {featuredCountdown?.title ?? "Event Akademik"}
                   </div>
                 </div>
               </div>
@@ -123,22 +190,33 @@ export default async function AkademikPage() {
               </div>
 
               <div className="mt-5 h-[10px] rounded-full bg-[rgba(241,245,249,0.2)] sm:mt-6 sm:h-[13px]">
-                <div className="h-[10px] w-[66%] rounded-full bg-cta sm:h-[13px]" />
+                <div
+                  className="h-[10px] rounded-full bg-cta transition-all sm:h-[13px]"
+                  style={{ width: `${progressWidth}%` }}
+                />
               </div>
 
-              <div className="mt-5 border-t border-base-white/20 pt-4 font-tagline text-[14px] text-[#cbd5e1]/60 sm:mt-6 sm:pt-5 sm:text-[15px]">
+              <div className="mt-5 border-t border-base-white/20 pt-4 font-tagline text-[14px] text-[#cbd5e1]/80 sm:mt-6 sm:pt-5 sm:text-[15px]">
                 Target :{" "}
-                {countdown
-                  ? `${countdownItem?.title} - ${countdown.target.toLocaleDateString(
-                      "id-ID",
-                      {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      },
+                {featuredCountdown
+                  ? `${featuredCountdown.title} - ${formatTargetDate(
+                      featuredCountdown.target_datetime,
                     )}`
                   : "Belum tersedia"}
               </div>
+
+              {countdownItems.length > 1 ? (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {countdownItems.slice(1, 4).map((item) => (
+                    <span
+                      key={item.id}
+                      className="rounded-full bg-base-white/10 px-3 py-1 text-[12px] text-[#e2e8f0]"
+                    >
+                      {item.title}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </article>
 
             <article className="rounded-[18px] bg-base-white p-5 shadow-[0_4px_17px_rgba(0,0,0,0.15)] sm:rounded-[20px] sm:p-7">
@@ -150,31 +228,71 @@ export default async function AkademikPage() {
                   <div className="font-body text-[12px] uppercase tracking-[0.08em] text-copy-soft">
                     Quick Download
                   </div>
-                  <div className="font-tagline text-[18px] text-primary sm:text-[20px]">Kalender Akademik</div>
+                  <div className="font-tagline text-[18px] text-primary sm:text-[20px]">
+                    {primaryDownload?.title ?? "Belum ada file aktif"}
+                  </div>
                 </div>
               </div>
 
               <p className="mt-5 font-tagline text-[14px] text-primary sm:mt-6 sm:text-[15px]">
-                Download PDF resmi kalender akademik UI Semester Genap 2025/2026.
+                {primaryDownload
+                  ? `Unduh atau buka resource akademik dari backend. Tipe resource: ${getDownloadLabel(
+                      primaryDownload,
+                    )}.`
+                  : "Saat ini quick download belum tersedia dari backend."}
               </p>
 
-              <div className="mt-5 flex items-center gap-3 rounded-[10px] border border-black/50 px-3 py-3 sm:mt-6 sm:gap-4 sm:px-4">
-                <div className="flex h-9 w-7 items-center justify-center rounded-sm bg-red-600 text-[10px] font-bold text-base-white">
-                  PDF
-                </div>
-                <div>
-                  <div className="font-tagline text-[15px] text-primary sm:text-[16px]">Kalender Akademik UI</div>
-                  <div className="font-tagline text-[14px] text-copy-soft">Tahun Akademik 2025/2026</div>
-                </div>
+              <div className="mt-5 space-y-3 sm:mt-6">
+                {quickDownloads.length > 0 ? (
+                  quickDownloads.slice(0, 3).map((item) => (
+                    <a
+                      key={item.id}
+                      href={resolveMediaUrl(item.resource_url) ?? "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-3 rounded-[10px] border border-black/20 px-3 py-3 transition hover:border-primary/40 sm:gap-4 sm:px-4"
+                    >
+                      <div className="flex h-9 w-9 items-center justify-center rounded-sm bg-red-600 text-[10px] font-bold text-base-white">
+                        {item.resource_type === "file" ? "FILE" : "LINK"}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="line-clamp-1 font-tagline text-[15px] text-primary sm:text-[16px]">
+                          {item.title}
+                        </div>
+                        <div className="font-tagline text-[14px] text-copy-soft">
+                          {item.resource_type === "file"
+                            ? "Resource file"
+                            : "External resource"}
+                        </div>
+                      </div>
+                    </a>
+                  ))
+                ) : (
+                  <div className="rounded-[12px] border border-dashed border-panel-border px-4 py-6 text-center font-tagline text-[14px] text-copy-soft">
+                    Quick download belum tersedia.
+                  </div>
+                )}
               </div>
 
-              <button
-                type="button"
-                className="mt-7 inline-flex h-[50px] w-full items-center justify-center gap-3 rounded-[14px] bg-cta px-5 font-tagline text-[16px] font-semibold text-black shadow-[0_8px_22px_rgba(252,194,2,0.26)] sm:mt-10 sm:h-[56px] sm:rounded-[16px] sm:px-6 sm:text-[18px]"
+              <a
+                href={primaryDownload ? resolveMediaUrl(primaryDownload.resource_url) ?? "#" : "#"}
+                target={primaryDownload ? "_blank" : undefined}
+                rel={primaryDownload ? "noreferrer" : undefined}
+                aria-disabled={!primaryDownload}
+                className={[
+                  "mt-7 inline-flex h-[50px] w-full items-center justify-center gap-3 rounded-[14px] px-5 font-tagline text-[16px] font-semibold sm:mt-10 sm:h-[56px] sm:rounded-[16px] sm:px-6 sm:text-[18px]",
+                  primaryDownload
+                    ? "bg-cta text-black shadow-[0_8px_22px_rgba(252,194,2,0.26)]"
+                    : "cursor-not-allowed bg-[#e5e7eb] text-[#94a3b8]",
+                ].join(" ")}
               >
                 <Download className="h-4 w-4" />
-                Download PDF
-              </button>
+                {primaryDownload
+                  ? primaryDownload.resource_type === "file"
+                    ? "Download Resource"
+                    : "Buka Resource"
+                  : "Belum Ada Resource"}
+              </a>
             </article>
 
             <article className="rounded-[18px] bg-[#f9f5e2] p-5 shadow-[0_4px_17px_rgba(0,0,0,0.15)] sm:rounded-[20px] sm:p-7">
@@ -186,13 +304,17 @@ export default async function AkademikPage() {
                   <div className="font-body text-[12px] uppercase tracking-[0.08em] text-copy-soft">
                     Penting
                   </div>
-                  <div className="font-tagline text-[18px] text-primary sm:text-[20px]">Disclaimer Internal</div>
+                  <div className="font-tagline text-[18px] text-primary sm:text-[20px]">
+                    Disclaimer Internal
+                  </div>
                 </div>
               </div>
 
               <div className="mt-5 rounded-[10px] border border-cta bg-primary p-4 sm:mt-6 sm:p-5">
                 <p className="font-tagline text-[13px] leading-5 text-base-white sm:text-[14px]">
-                  Materi ini hanya untuk kepentingan internal akademik mahasiswa Ekstensi FEB UI. Dilarang keras mendistribusikan atau menggunakan untuk kepentingan komersial.
+                  Materi ini hanya untuk kepentingan internal akademik mahasiswa
+                  Ekstensi FEB UI. Dilarang keras mendistribusikan atau
+                  menggunakan untuk kepentingan komersial.
                 </p>
               </div>
 
@@ -210,85 +332,42 @@ export default async function AkademikPage() {
             <SectionHeader
               eyebrow="Academic Hub"
               title="Repository Bahan Kuliah"
-              description="Akses folder Google Drive resmi untuk setiap angkatan dan program studi"
+              description="Akses folder Google Drive resmi untuk setiap section bahan kuliah."
               align="center"
             />
 
             <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 lg:grid-cols-2">
-              <RepositoryCard title="Akuntansi" years={["2024", "2025", "2026"]} tone="yellow" />
-              <RepositoryCard title="Manajemen" years={["2024", "2025", "2026"]} tone="blue" />
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-base-white px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-          <div className="mx-auto max-w-[1246px]">
-            <SectionHeader
-              eyebrow="Layanan Eksklusif"
-              title="Layanan Penunjang Digital"
-              description="Tingkatkan produktivitas akademikmu dengan akses eksklusif"
-            />
-
-            <div className="mt-6 grid gap-5 sm:mt-8 sm:gap-6 lg:grid-cols-2">
-              <article className="rounded-[18px] border-[3px] border-[#8b5cf6] bg-base-white p-5 shadow-[0_4px_17px_rgba(0,0,0,0.12)] sm:rounded-[20px] sm:p-7">
-                <div className="flex items-start gap-4 sm:gap-5">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-[#f3e8ff] sm:h-14 sm:w-14 sm:rounded-[16px]">
-                    <Palette className="h-6 w-6 text-[#8b5cf6] sm:h-7 sm:w-7" />
-                  </div>
-                  <div>
-                    <h3 className="font-tagline text-[18px] font-bold text-black sm:text-[20px]">
-                      Canva Pro Ekstensi
-                    </h3>
-                    <p className="mt-2 max-w-[360px] font-body text-[15px] leading-6 text-copy-muted sm:text-[16px]">
-                      Akses lisensi kolektif Canva Pro untuk kebutuhan presentasi dan desain tugas kuliah.
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="mt-5 inline-flex h-[48px] min-w-[200px] items-center justify-center gap-3 rounded-[14px] bg-[#8b5cf6] px-6 font-tagline text-[16px] font-semibold text-base-white shadow-[0_8px_22px_rgba(139,92,246,0.28)] sm:mt-6 sm:h-[56px] sm:min-w-[220px] sm:rounded-[16px] sm:px-7 sm:text-[18px]"
-                >
-                  Daftar Sekarang
-                </button>
-              </article>
-
-              <article className="rounded-[18px] border-[3px] border-[#5b8def] bg-base-white p-5 shadow-[0_4px_17px_rgba(0,0,0,0.12)] sm:rounded-[20px] sm:p-7">
-                <div className="flex items-start gap-4 sm:gap-5">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-[#eff6ff] sm:h-14 sm:w-14 sm:rounded-[16px]">
-                    <Sparkles className="h-6 w-6 text-[#3b82f6] sm:h-7 sm:w-7" />
-                  </div>
-                  <div>
-                    <h3 className="font-tagline text-[18px] font-bold text-black sm:text-[20px]">
-                      Gemini Advanced
-                    </h3>
-                    <p className="mt-2 max-w-[360px] font-body text-[15px] leading-6 text-copy-muted sm:text-[16px]">
-                      Gabung slot family sharing untuk akses AI Gemini Advanced sebagai asisten riset dan belajar.
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="mt-5 inline-flex h-[48px] min-w-[200px] items-center justify-center gap-3 rounded-[14px] bg-black px-6 font-tagline text-[16px] font-semibold text-base-white shadow-[0_8px_22px_rgba(0,0,0,0.18)] sm:mt-6 sm:h-[56px] sm:min-w-[220px] sm:rounded-[16px] sm:px-7 sm:text-[18px]"
-                >
-                  Gabung Slot
-                </button>
-              </article>
+              <RepositoryCard
+                title="Akuntansi"
+                items={mapRepositoryItems(repository.akuntansi)}
+                tone="yellow"
+              />
+              <RepositoryCard
+                title="Manajemen"
+                items={mapRepositoryItems(repository.manajemen)}
+                tone="blue"
+              />
             </div>
           </div>
         </section>
 
         <section className="border-y border-panel-border bg-surface-muted px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
           <div className="mx-auto max-w-[1294px]">
-            <SectionHeader eyebrow="Playlist" title="Extensipedia Youtube" align="center" />
+            <SectionHeader
+              eyebrow="Playlist"
+              title={youtubeSection?.title ?? "Extensipedia Youtube"}
+              description={
+                youtubeSection?.description ?? "Playlist YouTube belum tersedia."
+              }
+              align="center"
+            />
 
             <div className="mx-auto mt-6 max-w-[1620px] overflow-hidden rounded-[20px] border border-panel-border bg-panel-bg shadow-[0_8px_28px_rgba(3,57,93,0.08)] sm:mt-10 sm:rounded-[28px]">
-              {youtubeEmbedUrl ? (
+              {youtubeSection?.embed_url ? (
                 <div className="aspect-video w-full">
                   <iframe
-                    src={youtubeEmbedUrl}
-                    title="Extensipedia Youtube"
+                    src={youtubeSection.embed_url}
+                    title={youtubeSection.title}
                     className="h-full w-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen

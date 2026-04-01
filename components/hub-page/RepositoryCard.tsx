@@ -2,22 +2,26 @@ import { ExternalLink, FolderOpen } from "lucide-react";
 
 type RepositoryCardProps = {
   title: string;
-  years: string[];
+  items: Array<{
+    id: string;
+    title: string;
+    href: string;
+  }>;
   tone: "yellow" | "blue";
 };
 
-export function RepositoryCard({ title, years, tone }: RepositoryCardProps) {
+export function RepositoryCard({ title, items, tone }: RepositoryCardProps) {
   const toneClasses =
     tone === "yellow"
       ? {
           bar: "bg-accent-soft",
           iconWrap: "bg-accent-soft",
-          year: "bg-accent-soft text-primary",
+          item: "bg-accent-soft text-primary",
         }
       : {
           bar: "bg-[#eff6ff]",
           iconWrap: "bg-[#eff6ff]",
-          year: "bg-[#eff6ff] text-primary",
+          item: "bg-[#eff6ff] text-primary",
         };
 
   return (
@@ -36,20 +40,30 @@ export function RepositoryCard({ title, years, tone }: RepositoryCardProps) {
         </div>
 
         <div className="space-y-3">
-          {years.map((year) => (
-            <button
-              key={year}
-              type="button"
-              className={`flex h-[48px] w-full items-center justify-between rounded-[12px] px-3 py-2 font-tagline text-[18px] font-semibold sm:h-[52px] sm:text-[20px] ${toneClasses.year}`}
-            >
-              {year}
-              <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5" />
-            </button>
-          ))}
+          {items.length > 0 ? (
+            items.map((item) => (
+              <a
+                key={item.id}
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                className={`flex min-h-[48px] w-full items-center justify-between gap-3 rounded-[12px] px-3 py-3 font-tagline text-[16px] font-semibold sm:min-h-[52px] sm:text-[18px] ${toneClasses.item}`}
+              >
+                <span className="line-clamp-2">{item.title}</span>
+                <ExternalLink className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
+              </a>
+            ))
+          ) : (
+            <div className="rounded-[12px] border border-dashed border-panel-border px-4 py-5 text-center font-tagline text-[15px] text-copy-soft">
+              Repository belum tersedia.
+            </div>
+          )}
         </div>
 
         <p className="font-tagline text-[15px] text-copy-muted sm:text-[16px]">
-          Master Drive · Buka Drive
+          {items.length > 0
+            ? `${items.length} folder tersedia`
+            : "Belum ada folder aktif"}
         </p>
       </div>
     </article>

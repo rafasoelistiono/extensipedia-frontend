@@ -1,13 +1,121 @@
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://203.194.113.185";
+  (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://203.194.113.185").replace(
+    /\/$/,
+    "",
+  );
 
 type RequestOptions = RequestInit;
+
+export type ApiResponse<T> = {
+  success: boolean;
+  message: string;
+  data: T;
+};
+
+export type Paginated<T> = {
+  items: T[];
+  pagination: {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    page: number;
+    page_size: number;
+    total_pages: number;
+  };
+};
+
+export type AcademicCountdown = {
+  id: string;
+  title: string;
+  target_datetime: string;
+  display_order: number;
+};
+
+export type AcademicQuickDownload = {
+  id: string;
+  title: string;
+  resource_type: "file" | "external_link";
+  resource_url: string;
+  display_order: number;
+};
+
+export type AcademicRepositoryMaterial = {
+  id: string;
+  title: string;
+  google_drive_link: string;
+  display_order: number;
+};
+
+export type AcademicYoutubeSection = {
+  id: string;
+  title: string;
+  description: string;
+  embed_url: string;
+};
+
+export type CompetencyAgendaItem = {
+  id: string;
+  title: string;
+  short_description: string;
+  urgency_tag: boolean;
+  recommendation_tag: boolean;
+  category_tag: string;
+  scope_tag: string;
+  pricing_tag: string;
+  deadline_date: string;
+  registration_link: string;
+  google_calendar_link: string;
+  countdown_days: number;
+};
+
+export type FeaturedAspiration = {
+  id: string;
+  ticket_id: string;
+  title: string;
+  short_description: string;
+  visibility: "public" | "anonymous" | string;
+  sender_name: string | null;
+  status: string;
+  upvote_count: number;
+  vote_count: number;
+  created_at: string;
+};
+
+export type TicketTracking = {
+  ticket_id: string | null;
+  title: string | null;
+  status: string | null;
+  submitted_at: string | null;
+  updated_at: string | null;
+  visibility: string | null;
+  short_description: string | null;
+};
+
+function buildApiUrl(
+  path: string,
+  query?: Record<string, string | number | boolean | undefined | null>,
+) {
+  const url = new URL(`${BASE_URL}${path}`);
+
+  if (query) {
+    Object.entries(query).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === "") {
+        return;
+      }
+
+      url.searchParams.set(key, String(value));
+    });
+  }
+
+  return url.toString();
+}
 
 export async function request<T>(
   path: string,
   options: RequestOptions = {},
+  query?: Record<string, string | number | boolean | undefined | null>,
 ): Promise<T> {
-  const response = await fetch(`${BASE_URL}${path}`, {
+  const response = await fetch(buildApiUrl(path, query), {
     ...options,
     cache: "no-store",
   });
@@ -19,217 +127,110 @@ export async function request<T>(
   return response.json() as Promise<T>;
 }
 
-export type CompetencyAgendaApiResponse = {
-  success: boolean;
-  message: string;
-  data: {
-    items: Array<{
-      id: string;
-      title: string;
-      short_description: string;
-      urgency_tag: boolean;
-      recommendation_tag: boolean;
-      category_tag: string;
-      scope_tag: string;
-      pricing_tag: string;
-      deadline_date: string;
-      registration_link: string;
-      google_calendar_link: string;
-      countdown_days: number;
-    }>;
-    pagination: {
-      count: number;
-      next: string | null;
-      previous: string | null;
-      page: number;
-      page_size: number;
-      total_pages: number;
-    };
-  };
-};
-
-export async function getCompetencyAgendas() {
-  return request<CompetencyAgendaApiResponse>(
-    "/api/v1/public/competency/agenda-cards/",
-  );
-}
-
-export type AcademicYoutubeApiResponse = {
-  success: boolean;
-  message: string;
-  data: {
-    id: string;
-    title: string;
-    description: string;
-    embed_url: string;
-  };
-};
-
 export async function getAcademicYoutube() {
-  return request<AcademicYoutubeApiResponse>(
+  return request<ApiResponse<AcademicYoutubeSection>>(
     "/api/v1/public/academic/youtube/",
   );
 }
 
-export type AcademicCountdownsApiResponse = {
-  success: boolean;
-  message: string;
-  data: {
-    items: Array<{
-      id: string;
-      title: string;
-      target_datetime: string;
-      display_order: number;
-    }>;
-    pagination: {
-      count: number;
-      next: string | null;
-      previous: string | null;
-      page: number;
-      page_size: number;
-      total_pages: number;
-    };
-  };
-};
-
-export async function getAcademicCountdowns() {
-  return request<AcademicCountdownsApiResponse>(
+export async function getAcademicCountdowns(query?: {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  ordering?: string;
+}) {
+  return request<ApiResponse<Paginated<AcademicCountdown>>>(
     "/api/v1/public/academic/countdown-events/",
+    {},
+    query,
   );
 }
 
-export type CabinetCalendarApiResponse = {
-  success: boolean;
-  message: string;
-  data: {
-    id: string;
-    title: string;
-    description: string;
-    embed_url: string;
-    embed_code: string;
-    provider: string;
-  };
-};
+export async function getAcademicQuickDownloads(query?: {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  ordering?: string;
+}) {
+  return request<ApiResponse<Paginated<AcademicQuickDownload>>>(
+    "/api/v1/public/academic/quick-downloads/",
+    {},
+    query,
+  );
+}
+
+export async function getAcademicRepository() {
+  return request<
+    ApiResponse<{
+      akuntansi: AcademicRepositoryMaterial[];
+      manajemen: AcademicRepositoryMaterial[];
+    }>
+  >("/api/v1/public/academic/repository/");
+}
+
+export async function getCompetencyAgendas(query?: {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  ordering?: string;
+  urgency_tag?: boolean;
+  recommendation_tag?: boolean;
+  category_tag?: string;
+  scope_tag?: string;
+  pricing_tag?: string;
+}) {
+  return request<ApiResponse<Paginated<CompetencyAgendaItem>>>(
+    "/api/v1/public/competency/agenda-cards/",
+    {},
+    query,
+  );
+}
 
 export async function getCabinetCalendar() {
-  return request<CabinetCalendarApiResponse>(
-    "/api/v1/public/about/cabinet-calendar/",
-  );
+  return request<
+    ApiResponse<{
+      id: string;
+      title: string;
+      description: string;
+      embed_url: string;
+      embed_code: string;
+      provider: string;
+    }>
+  >("/api/v1/public/about/cabinet-calendar/");
 }
 
-export type FeaturedAspiration = {
-  id: string;
-  title: string;
-  description: string;
-  user: string;
-  featured?: boolean;
-  evidenceImage?: string;
-};
-
-export const fallbackFeaturedAspirations: FeaturedAspiration[] = [
-  {
-    id: "fallback-1",
-    title: "Perspiciatis esse molestiae vel qui.",
-    description:
-      "Quasi quo sit suscipit tempora aperiam rerum placeat id. Voluptatem praesentium excepturi id. Repudiandae incidunt doloremque. Error est et ullam.",
-    user: "Anonim",
-  },
-  {
-    id: "fallback-2",
-    title: "Perspiciatis esse molestiae vel qui.",
-    description:
-      "Quasi quo sit suscipit tempora aperiam rerum placeat id. Voluptatem praesentium excepturi id. Repudiandae incidunt doloremque. Error est et ullam.",
-    user: "Dimasukkan oleh : Lorem Ipsum",
-  },
-  {
-    id: "fallback-3",
-    title: "Perspiciatis esse molestiae vel qui.",
-    description:
-      "Quasi quo sit suscipit tempora aperiam rerum placeat id. Voluptatem praesentium excepturi id. Repudiandae incidunt doloremque. Error est et ullam.",
-    user: "Anonim",
-  },
-  {
-    id: "fallback-4",
-    title: "Perspiciatis esse molestiae vel qui.",
-    description:
-      "Quasi quo sit suscipit tempora aperiam rerum placeat id. Voluptatem praesentium excepturi id. Repudiandae incidunt doloremque. Error est et ullam.",
-    user: "Dimasukkan oleh : Lorem Ipsum",
-    featured: true,
-    evidenceImage: "/hero-campus.jpg",
-  },
-];
-
-type FeaturedAspirationApiResponse = {
-  success: boolean;
-  message: string;
-  data: unknown;
-};
-
-function normalizeFeaturedAspirations(data: unknown): FeaturedAspiration[] {
-  const source = Array.isArray(data)
-    ? data
-    : typeof data === "object" && data !== null
-      ? Array.isArray((data as { items?: unknown[] }).items)
-        ? (data as { items: unknown[] }).items
-        : Array.isArray((data as { results?: unknown[] }).results)
-          ? (data as { results: unknown[] }).results
-          : []
-      : [];
-
-  const normalized: FeaturedAspiration[] = [];
-
-  source.forEach((item, index) => {
-    if (typeof item !== "object" || item === null) {
-      return;
-    }
-
-    const record = item as Record<string, unknown>;
-    const title =
-      (typeof record.title === "string" && record.title) ||
-      (typeof record.subject === "string" && record.subject) ||
-      (typeof record.name === "string" && record.name) ||
-      "";
-    const description =
-      (typeof record.description === "string" && record.description) ||
-      (typeof record.content === "string" && record.content) ||
-      (typeof record.message === "string" && record.message) ||
-      "";
-    const user =
-      (typeof record.user === "string" && record.user) ||
-      (typeof record.submitter_name === "string" && record.submitter_name) ||
-      (typeof record.author === "string" && record.author) ||
-      "Anonim";
-    const evidenceImage =
-      (typeof record.evidence_image === "string" && record.evidence_image) ||
-      (typeof record.image === "string" && record.image) ||
-      (typeof record.proof_url === "string" && record.proof_url) ||
-      undefined;
-
-    if (!title || !description) {
-      return;
-    }
-
-    normalized.push({
-      id:
-        (typeof record.id === "string" && record.id) ||
-        (typeof record.id === "number" ? String(record.id) : `featured-${index}`),
-      title,
-      description,
-      user,
-      featured: Boolean(evidenceImage),
-      evidenceImage,
-    });
-  });
-
-  return normalized;
-}
-
-export async function getFeaturedAspirations() {
-  const response = await request<FeaturedAspirationApiResponse>(
+export async function getFeaturedAspirations(query?: {
+  visibility?: "public" | "anonymous";
+}) {
+  const response = await request<ApiResponse<FeaturedAspiration[]>>(
     "/api/v1/public/aspirations/featured/",
+    {},
+    query,
   );
 
-  return normalizeFeaturedAspirations(response.data);
+  return response.data;
+}
+
+export async function trackTicket(ticketId?: string) {
+  return request<ApiResponse<TicketTracking>>(
+    "/api/v1/public/tickets/track/",
+    {},
+    {
+      ticket_id: ticketId,
+    },
+  );
+}
+
+export function resolveMediaUrl(url: string | null | undefined) {
+  if (!url) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+
+  return `${BASE_URL}${url.startsWith("/") ? url : `/${url}`}`;
 }
 
 export { BASE_URL };

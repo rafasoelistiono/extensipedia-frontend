@@ -1,21 +1,18 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowUpRight,
   BadgeAlert,
   BriefcaseBusiness,
-  ChevronDown,
   FileSpreadsheet,
   Megaphone,
   MessageCircleMore,
-  Search,
   ShieldCheck,
   Ticket,
 } from "lucide-react";
-import { AspirasiCard } from "@/components/AspirasiCard";
 import { BreadcrumbTrail } from "@/components/BreadcrumbTrail";
 import { AspirationSubmitForm } from "@/components/support-hub/AspirationSubmitForm";
-import { Button } from "@/components/ui/Button";
+import { FeaturedAspirationsSection } from "@/components/support-hub/FeaturedAspirationsSection";
+import { TicketTracker } from "@/components/support-hub/TicketTracker";
 import type { FeaturedAspiration } from "@/lib/public-api";
 
 type SupportHubProps = {
@@ -195,85 +192,6 @@ function PolicyCard({
   );
 }
 
-function TicketTracker() {
-  return (
-    <article className="overflow-hidden rounded-[20px] border border-base-grey bg-base-white shadow-[0_4px_17px_rgba(0,0,0,0.16)]">
-      <div className="flex items-center gap-3 bg-primary px-5 py-5 text-base-white sm:px-6">
-        <Ticket className="h-5 w-5 text-cta" />
-        <h3 className="font-headline text-[22px] leading-none text-base-white">
-          Jaring Aspirasi Digital
-        </h3>
-      </div>
-
-      <div className="space-y-5 p-5 sm:p-6">
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <label className="relative block flex-1">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-copy-soft" />
-            <input
-              type="text"
-              placeholder="ID Tiket (Contoh: ASP-2026-XXXX)"
-              className="input-base h-12 w-full rounded-[10px] pl-11 pr-4 text-[14px] outline-none"
-            />
-          </label>
-
-          <Button
-            variant="secondary"
-            className="h-12 rounded-[10px] px-5 text-[14px] sm:min-w-[88px]"
-          >
-            Lacak
-          </Button>
-        </div>
-
-        <div className="rounded-[20px] border border-[#d0e1ec] bg-[#e8f4fd] p-4 sm:p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-copy-soft">
-                ID Tiket
-              </div>
-              <div className="mt-1 font-headline text-[24px] leading-none text-primary">
-                ASP-2026-0042
-              </div>
-              <p className="mt-2 text-[12px] leading-5 text-copy-soft">
-                Kategori: Finansial · Diajukan: 20 Feb 2026
-              </p>
-              <p className="mt-2 font-tagline text-[15px] font-semibold text-primary">
-                Kendala Pengajuan Cicilan UKT Semester Genap
-              </p>
-            </div>
-
-            <span className="inline-flex h-7 items-center justify-center rounded-full bg-cta px-3 font-tagline text-[12px] font-semibold text-primary">
-              Investigating
-            </span>
-          </div>
-
-          <details className="mt-4 overflow-hidden rounded-[10px] bg-[#ffecaf]" open>
-            <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-1.5 font-tagline text-[14px] font-semibold text-primary">
-              Detail Tiket
-              <ChevronDown className="h-4 w-4" />
-            </summary>
-            <div className="p-2 pt-0">
-              <div className="rounded-[12px] bg-base-white px-4 py-3 text-[14px] leading-7 text-black">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat.
-              </div>
-            </div>
-          </details>
-
-          <a
-            href="#"
-            className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-[8px] bg-primary px-4 font-tagline text-[14px] font-semibold !text-base-white transition hover:bg-[#0a4c79] [&_svg]:!text-base-white"
-          >
-            Lihat Bukti
-            <ArrowUpRight className="h-4 w-4" />
-          </a>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 export function SupportHub({ activeTab, aspirations }: SupportHubProps) {
   const isTicketTab = activeTab === "lacak";
 
@@ -327,41 +245,7 @@ export function SupportHub({ activeTab, aspirations }: SupportHubProps) {
       </section>
 
       {!isTicketTab ? (
-        <section className="bg-base-white px-4 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-10 lg:px-8">
-          <div className="mx-auto max-w-[1287px]">
-            <div className="text-center">
-              <div className="section-eyebrow">Aspirasi Mahasiswa</div>
-              <h2 className="section-title mt-2 text-[30px] leading-none sm:text-[42px]">
-                Jaring Aspirasi
-              </h2>
-            </div>
-
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-[12px] sm:mt-8 sm:gap-3">
-              <span className="inline-flex items-center gap-2 text-copy-soft">
-                <BadgeAlert className="h-4 w-4" />
-                Publikasi:
-              </span>
-              {["Semua", "Publik", "Anonim"].map((filter, index) => (
-                <button
-                  key={filter}
-                  type="button"
-                  className={[
-                    "rounded-full px-4 py-1.5 font-tagline text-[13px] transition sm:px-5 sm:text-[14px]",
-                    index === 0 ? "pill-tab-active" : "pill-tab",
-                  ].join(" ")}
-                >
-                  {filter}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-6 grid gap-4 md:grid-cols-2 sm:mt-8">
-              {aspirations.map((item) => (
-                <AspirasiCard key={item.id} {...item} />
-              ))}
-            </div>
-          </div>
-        </section>
+        <FeaturedAspirationsSection aspirations={aspirations} />
       ) : null}
 
       <section className="bg-base-white px-4 pb-14 pt-4 sm:px-6 sm:pb-16 sm:pt-6 lg:px-8">

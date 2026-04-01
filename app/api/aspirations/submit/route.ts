@@ -10,10 +10,10 @@ export async function POST(request: Request) {
     const npm = String(formData.get("npm") || "").trim();
     const email = String(formData.get("email") || "").trim();
     const title = String(formData.get("title") || "").trim();
-    const description = String(formData.get("description") || "").trim();
-    const attachment = formData.get("attachment");
+    const shortDescription = String(formData.get("short_description") || "").trim();
+    const attachment = formData.get("evidence_attachment");
 
-    if (!fullName || !npm || !email || !title || !description) {
+    if (!fullName || !npm || !email || !title || !shortDescription) {
       return NextResponse.json(
         { message: "Semua field wajib harus diisi." },
         { status: 400 },
@@ -23,20 +23,13 @@ export async function POST(request: Request) {
     const upstream = new FormData();
 
     upstream.append("full_name", fullName);
-    upstream.append("name", fullName);
     upstream.append("npm", npm);
-    upstream.append("student_id", npm);
     upstream.append("email", email);
     upstream.append("title", title);
-    upstream.append("subject", title);
-    upstream.append("description", description);
-    upstream.append("details", description);
-    upstream.append("content", description);
+    upstream.append("short_description", shortDescription);
 
     if (attachment instanceof File && attachment.size > 0) {
-      upstream.append("attachment", attachment);
-      upstream.append("evidence", attachment);
-      upstream.append("proof_file", attachment);
+      upstream.append("evidence_attachment", attachment);
     }
 
     const response = await fetch(SUBMIT_URL, {
@@ -66,15 +59,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ message }, { status: response.status });
     }
 
-    const message =
+    const upstreamMessage =
       typeof parsed === "object" &&
       parsed !== null &&
       "message" in parsed &&
       typeof (parsed as { message?: unknown }).message === "string"
         ? (parsed as { message: string }).message
-        : "Aspirasi berhasil dikirim.";
+        : "Aspiration submitted successfully";
 
-    return NextResponse.json({ message, data: parsed });
+    return NextResponse.json({
+      message: `${upstreamMessage} Aspirasi sudah masuk ke backend, silakan cek email untuk notifikasi lanjutan.`,
+      data: parsed,
+    });
   } catch {
     return NextResponse.json(
       { message: "Terjadi kendala saat menghubungi server aspirasi." },

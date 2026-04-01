@@ -4,13 +4,31 @@ import { useState } from "react";
 import { Megaphone, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
+type SubmitResponse = {
+  message?: string;
+  data?: {
+    message?: string;
+    data?: {
+      ticket_id?: string;
+      title?: string;
+      status?: string;
+      submitted_at?: string;
+    };
+  };
+};
+
 export function AspirationSubmitForm() {
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">(
+    "idle",
+  );
   const [message, setMessage] = useState("");
+  const [ticketId, setTicketId] = useState<string | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
   async function handleSubmit(formData: FormData) {
     setStatus("submitting");
     setMessage("");
+    setTicketId(null);
 
     try {
       const response = await fetch("/api/aspirations/submit", {
@@ -18,14 +36,18 @@ export function AspirationSubmitForm() {
         body: formData,
       });
 
-      const result = (await response.json()) as { message?: string };
+      const result = (await response.json()) as SubmitResponse;
 
       if (!response.ok) {
         throw new Error(result.message || "Gagal mengirim aspirasi.");
       }
 
       setStatus("success");
-      setMessage(result.message || "Aspirasi berhasil dikirim.");
+      setTicketId(result.data?.data?.ticket_id ?? null);
+      setMessage(
+        result.message ||
+          "Aspirasi berhasil dikirim ke backend. Notifikasi lanjutan akan dikirim melalui email.",
+      );
     } catch (error) {
       setStatus("error");
       setMessage(
@@ -95,11 +117,11 @@ export function AspirationSubmitForm() {
 
         <label className="block">
           <span className="font-tagline text-[14px] font-semibold text-primary">
-            KETERANGAN LENGKAP
+            KETERANGAN SINGKAT
           </span>
           <textarea
-            name="description"
-            placeholder="Ceritakan masalah atau aspirasi kamu secara detail. Semakin lengkap, semakin mudah ditindaklanjuti."
+            name="short_description"
+            placeholder="Ceritakan inti aspirasi kamu secara jelas agar mudah ditindaklanjuti backend."
             rows={5}
             className="input-base mt-2 w-full rounded-[10px] px-4 py-3 text-[14px] leading-6 outline-none"
             required
@@ -121,12 +143,24 @@ export function AspirationSubmitForm() {
             <span className="mt-4 rounded-[10px] border border-panel-border bg-base-white px-4 py-2 text-[13px] font-semibold text-primary">
               Select File
             </span>
-            <input type="file" name="attachment" className="hidden" />
+            {selectedFileName ? (
+              <span className="mt-3 text-[13px] text-copy-soft">
+                {selectedFileName}
+              </span>
+            ) : null}
+            <input
+              type="file"
+              name="evidence_attachment"
+              className="hidden"
+              onChange={(event) =>
+                setSelectedFileName(event.target.files?.[0]?.name ?? null)
+              }
+            />
           </label>
         </div>
 
         {message ? (
-          <p
+          <div
             className={[
               "rounded-[10px] px-4 py-3 text-[14px]",
               status === "success"
@@ -134,14 +168,18 @@ export function AspirationSubmitForm() {
                 : "bg-[#fff1f2] text-[#be123c]",
             ].join(" ")}
           >
-            {message}
-          </p>
+            <p>{message}</p>
+            {ticketId ? (
+              <p className="mt-2 font-semibold">Ticket ID: {ticketId}</p>
+            ) : null}
+          </div>
         ) : null}
 
         <Button
           type="submit"
           variant="secondary"
           className="h-11 w-full justify-center rounded-[10px] text-[14px] disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={status === "submitting"}
         >
           {status === "submitting" ? "Mengirim..." : "Kirim Aspirasi"}
         </Button>

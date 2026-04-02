@@ -1,7 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, ChevronDown, Funnel, Search } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  ChevronDown,
+  Funnel,
+  Search,
+  Star,
+} from "lucide-react";
 import { CompetitionCard } from "@/components/hub-page/CompetitionCard";
 import type { CompetencyAgendaItem } from "@/lib/public-api";
 
@@ -448,6 +456,38 @@ export function CompetencyHubClient({ items }: CompetencyHubClientProps) {
               </p>
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="bg-base-white px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8 lg:pb-20">
+        <div className="mx-auto max-w-[1271px] rounded-[20px] border border-[#d0e1ec] bg-[#e8f4fd] p-3 sm:p-4 lg:rounded-[24px] lg:px-[43px] lg:py-[26px]">
+          <div className="flex flex-col gap-4">
+            <div className="relative min-h-[180px] overflow-hidden rounded-[14px] bg-primary p-4 sm:min-h-[220px] sm:p-5 lg:min-h-[250px] lg:rounded-[10px] lg:p-[14px]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(91,181,225,0.16),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0))]" />
+              <Star className="relative h-7 w-7 fill-cta text-cta" />
+            </div>
+
+            <div className="flex flex-col gap-4 rounded-[18px] border border-primary bg-[#dbe9f5] px-4 py-4 sm:px-5 lg:flex-row lg:items-center lg:justify-between lg:rounded-[20px] lg:px-5">
+              <div className="max-w-[663px]">
+                <h2 className="section-title text-[20px] leading-tight">
+                  Meet Our Previous Winners
+                </h2>
+                <p className="mt-1 text-[14px] leading-6 text-copy-soft sm:text-[16px]">
+                  Get inspired by last year&apos;s winners. Think you have what it
+                  takes?
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="inline-flex h-10 items-center justify-center gap-2 self-start rounded-[10px] bg-primary px-4 font-tagline text-[14px] font-semibold text-base-white sm:text-[15px] lg:w-[225px]"
+                aria-label="Lihat Pemenang"
+              >
+                <span>Lihat Pemenang</span>
+                <ArrowUpRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </section>
     </>

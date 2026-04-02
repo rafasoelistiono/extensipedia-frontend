@@ -116,9 +116,9 @@ export function CompetitionCard({
             rel={hasRegistrationLink ? "noreferrer" : undefined}
             aria-disabled={!hasRegistrationLink}
             className={[
-              "flex h-10 flex-1 items-center justify-center rounded-[10px] px-3 font-tagline text-[15px] font-bold sm:text-[16px]",
+              "flex h-10 flex-1 items-center justify-center rounded-[10px] px-3 font-tagline text-[15px] font-bold whitespace-nowrap sm:text-[16px]",
               hasRegistrationLink
-                ? "bg-primary text-base-white"
+                ? "bg-primary !text-base-white"
                 : "cursor-not-allowed bg-[#e5e7eb] text-[#94a3b8]",
             ].join(" ")}
           >

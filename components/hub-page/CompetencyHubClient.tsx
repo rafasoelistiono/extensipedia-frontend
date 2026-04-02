@@ -12,6 +12,11 @@ import {
 } from "lucide-react";
 import { CompetitionCard } from "@/components/hub-page/CompetitionCard";
 import type { CompetencyAgendaItem } from "@/lib/public-api";
+import {
+  competencyDeadlineFormatter,
+  getCompetencyCountdownLabel,
+  getCompetencyTone,
+} from "@/lib/competency-ui";
 
 type CompetencyHubClientProps = {
   items: CompetencyAgendaItem[];
@@ -20,31 +25,6 @@ type CompetencyHubClientProps = {
 const ITEMS_PER_PAGE = 6;
 
 const monthFormatter = new Intl.DateTimeFormat("id-ID", { month: "long" });
-const deadlineFormatter = new Intl.DateTimeFormat("id-ID", {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-});
-
-function getTone(item: CompetencyAgendaItem) {
-  if (item.recommendation_tag) {
-    return "primary" as const;
-  }
-
-  if (item.scope_tag.toLowerCase() === "internasional") {
-    return "green" as const;
-  }
-
-  return "sky" as const;
-}
-
-function getCountdownLabel(days: number) {
-  if (days <= 0) {
-    return "Hari ini";
-  }
-
-  return `${days} hari lagi`;
-}
 
 function getYearOptions(items: CompetencyAgendaItem[]) {
   return Array.from(
@@ -396,8 +376,8 @@ export function CompetencyHubClient({ items }: CompetencyHubClientProps) {
                     key={item.id}
                     title={item.title}
                     description={item.short_description}
-                    deadline={deadlineFormatter.format(new Date(item.deadline_date))}
-                    countdownLabel={getCountdownLabel(item.countdown_days)}
+                    deadline={competencyDeadlineFormatter.format(new Date(item.deadline_date))}
+                    countdownLabel={getCompetencyCountdownLabel(item.countdown_days)}
                     category={item.category_tag}
                     scope={item.scope_tag}
                     pricing={item.pricing_tag}
@@ -405,7 +385,7 @@ export function CompetencyHubClient({ items }: CompetencyHubClientProps) {
                     recommended={item.recommendation_tag}
                     registrationLink={item.registration_link}
                     googleCalendarLink={item.google_calendar_link}
-                    tone={getTone(item)}
+                    tone={getCompetencyTone(item)}
                   />
                 ))}
               </div>

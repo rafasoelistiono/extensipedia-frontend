@@ -55,21 +55,25 @@ export function TicketTracker() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
     "idle",
   );
-  const [message, setMessage] = useState(
-    "Masukkan ticket ID untuk melihat progres aspirasi.",
-  );
+  const [message, setMessage] = useState("");
   const [result, setResult] = useState<TicketTracking | null>(null);
 
   async function handleTrack() {
+    if (!ticketId.trim()) {
+      setStatus("error");
+      setMessage("Masukkan ID tiket terlebih dahulu.");
+      setResult(null);
+      return;
+    }
+
     setStatus("loading");
     setMessage("");
+    setResult(null);
 
     try {
       const params = new URLSearchParams();
 
-      if (ticketId.trim()) {
-        params.set("ticket_id", ticketId.trim());
-      }
+      params.set("ticket_id", ticketId.trim());
 
       const response = await fetch(`/api/aspirations/track?${params.toString()}`, {
         cache: "no-store",
@@ -80,19 +84,28 @@ export function TicketTracker() {
         throw new Error(payload.message || "Gagal melacak tiket.");
       }
 
+      if (!payload.data?.ticket_id) {
+        setStatus("error");
+        setMessage("ID tiket tidak ditemukan. Periksa kembali dan coba lagi.");
+        setResult(null);
+        return;
+      }
+
       setStatus("success");
-      setMessage(payload.message || "Tracking tiket berhasil dimuat.");
-      setResult(payload.data ?? null);
+      setMessage("");
+      setResult(payload.data);
     } catch (error) {
       setStatus("error");
       setMessage(
-        error instanceof Error ? error.message : "Terjadi kendala saat melacak tiket.",
+        error instanceof Error
+          ? error.message
+          : "ID tiket tidak dapat ditemukan atau terjadi kendala saat melacak tiket.",
       );
       setResult(null);
     }
   }
 
-  const isFound = Boolean(result?.ticket_id);
+  const isFound = Boolean(result?.ticket_id) && status === "success";
 
   return (
     <article className="overflow-hidden rounded-[20px] border border-base-grey bg-base-white shadow-[0_4px_17px_rgba(0,0,0,0.16)]">
@@ -126,71 +139,62 @@ export function TicketTracker() {
           </Button>
         </div>
 
-        <p
-          className={[
-            "rounded-[12px] px-4 py-3 text-[14px]",
-            status === "error"
-              ? "bg-[#fff1f2] text-[#be123c]"
-              : "bg-[#eff6ff] text-primary",
-          ].join(" ")}
-        >
-          {message}
-        </p>
+        {message ? (
+          <p className="rounded-[12px] bg-[#fff1f2] px-4 py-3 text-[14px] text-[#be123c]">
+            {message}
+          </p>
+        ) : null}
 
-        <div className="rounded-[20px] border border-[#d0e1ec] bg-[#e8f4fd] p-4 sm:p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-copy-soft">
-                ID Tiket
+        {isFound ? (
+          <div className="rounded-[20px] border border-[#d0e1ec] bg-[#e8f4fd] p-4 sm:p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-copy-soft">
+                  ID Tiket
+                </div>
+                <div className="mt-1 font-headline text-[24px] leading-none text-primary">
+                  {result?.ticket_id}
+                </div>
+                <p className="mt-2 text-[12px] leading-5 text-copy-soft">
+                  Visibility: {result?.visibility ?? "-"} · Diajukan:{" "}
+                  {formatDate(result?.submitted_at ?? null)}
+                </p>
+                <p className="mt-2 font-tagline text-[15px] font-semibold text-primary">
+                  {result?.title}
+                </p>
               </div>
-              <div className="mt-1 font-headline text-[24px] leading-none text-primary">
-                {result?.ticket_id ?? "-"}
-              </div>
-              <p className="mt-2 text-[12px] leading-5 text-copy-soft">
-                Visibility: {result?.visibility ?? "-"} · Diajukan:{" "}
-                {formatDate(result?.submitted_at ?? null)}
-              </p>
-              <p className="mt-2 font-tagline text-[15px] font-semibold text-primary">
-                {result?.title ?? "Belum ada tiket yang ditampilkan"}
-              </p>
+
+              <span className="inline-flex h-7 items-center justify-center rounded-full bg-cta px-3 font-tagline text-[12px] font-semibold text-primary">
+                {formatStatus(result?.status ?? null) ?? "Belum ada status"}
+              </span>
             </div>
 
-            <span className="inline-flex h-7 items-center justify-center rounded-full bg-cta px-3 font-tagline text-[12px] font-semibold text-primary">
-              {formatStatus(result?.status ?? null) ?? "Belum ada status"}
-            </span>
-          </div>
-
-          <div className="mt-4 overflow-hidden rounded-[10px] bg-[#ffecaf]">
-            <div className="flex items-center justify-between px-4 py-2 font-tagline text-[14px] font-semibold text-primary">
-              Detail Tiket
-            </div>
-            <div className="p-2 pt-0">
-              <div className="rounded-[12px] bg-base-white px-4 py-3 text-[14px] leading-7 text-black">
-                {result?.short_description ??
-                  "Cari ticket ID yang benar untuk melihat detail progres aspirasi."}
+            <div className="mt-4 overflow-hidden rounded-[10px] bg-[#ffecaf]">
+              <div className="flex items-center justify-between px-4 py-2 font-tagline text-[14px] font-semibold text-primary">
+                Detail Tiket
+              </div>
+              <div className="p-2 pt-0">
+                <div className="rounded-[12px] bg-base-white px-4 py-3 text-[14px] leading-7 text-black">
+                  {result?.short_description}
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[10px] bg-base-white px-4 py-3 text-[13px] text-copy-soft">
-              <div className="font-semibold text-primary">Diperbarui</div>
-              <div className="mt-1">{formatDate(result?.updated_at ?? null)}</div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-[10px] bg-base-white px-4 py-3 text-[13px] text-copy-soft">
+                <div className="font-semibold text-primary">Diperbarui</div>
+                <div className="mt-1">{formatDate(result?.updated_at ?? null)}</div>
+              </div>
+              <a
+                href="/advokasi"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-[8px] bg-primary px-4 font-tagline text-[14px] font-semibold !text-base-white transition hover:bg-[#0a4c79] [&_svg]:!text-base-white"
+              >
+                Lihat Form Aspirasi
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
             </div>
-            <a
-              href={isFound ? "/advokasi" : "#"}
-              className={[
-                "inline-flex h-10 items-center justify-center gap-2 rounded-[8px] px-4 font-tagline text-[14px] font-semibold [&_svg]:!text-base-white",
-                isFound
-                  ? "bg-primary !text-base-white transition hover:bg-[#0a4c79]"
-                  : "cursor-not-allowed bg-[#cbd5e1] !text-base-white",
-              ].join(" ")}
-            >
-              Lihat Form Aspirasi
-              <ArrowUpRight className="h-4 w-4" />
-            </a>
           </div>
-        </div>
+        ) : null}
       </div>
     </article>
   );

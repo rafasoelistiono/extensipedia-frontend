@@ -61,6 +61,7 @@ export function FeaturedAspirationsSection({
             {filteredAspirations.map((item) => (
               <AspirasiCard
                 key={item.id}
+                id={item.id}
                 title={item.title}
                 shortDescription={item.short_description}
                 senderName={item.sender_name}

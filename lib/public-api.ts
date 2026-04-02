@@ -68,6 +68,15 @@ export type CompetencyAgendaItem = {
   countdown_days: number;
 };
 
+export type CareerResources = {
+  id: string;
+  cv_templates: string;
+  cover_letter: string;
+  portfolio_guide: string;
+  salary_script: string;
+  case_study_interview_prep: string;
+};
+
 export type FeaturedAspiration = {
   id: string;
   ticket_id: string;
@@ -197,6 +206,12 @@ export async function getCabinetCalendar() {
       provider: string;
     }>
   >("/api/v1/public/about/cabinet-calendar/");
+}
+
+export async function getCareerResources() {
+  return request<ApiResponse<CareerResources>>(
+    "/api/v1/public/career/resources/",
+  );
 }
 
 export async function getFeaturedAspirations(query?: {

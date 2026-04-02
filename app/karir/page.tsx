@@ -16,6 +16,7 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { ScrollReset } from "@/components/ScrollReset";
 import { HeroBanner } from "@/components/hub-page/HeroBanner";
+import { getCareerResources, resolveMediaUrl, type CareerResources } from "@/lib/public-api";
 
 export const metadata: Metadata = {
   title: "Career Center | Extensipedia",
@@ -26,45 +27,6 @@ const stats = [
   { value: "8", label: "Platform Karir" },
   { value: "500+", label: "Template" },
 ];
-
-const resources = [
-  {
-    title: "CV Templates",
-    description:
-      "Master template CV yang telah lulus sistem screening otomatis Big 4, Tech Giants, dan FMCG.",
-    meta: "6 template tersedia · DOC & PDF",
-    badge: "ATS",
-    badgeTone: "success",
-    icon: FileText,
-  },
-  {
-    title: "Cover Letter",
-    description:
-      "Template cover letter profesional dengan struktur yang terbukti meningkatkan response rate hingga 3x lipat.",
-    meta: "4 template tersedia · DOC & PDF",
-    badge: "ATS",
-    badgeTone: "info",
-    icon: BadgeCheck,
-  },
-  {
-    title: "Portfolio Guide",
-    description:
-      "Panduan menyusun portfolio berbasis hasil untuk jalur manajerial dan spesialis.",
-    meta: "2 framework tersedia · PDF",
-    badge: "Guide",
-    badgeTone: "lavender",
-    icon: NotebookText,
-  },
-  {
-    title: "Salary Script",
-    description:
-      "Skrip negosiasi gaji dan kompensasi yang efektif untuk fresh graduate dan career switcher.",
-    meta: "3 skenario tersedia · PDF",
-    badge: "Hot",
-    badgeTone: "warning",
-    icon: CircleDollarSign,
-  },
-] as const;
 
 const getawayGroups = [
   {
@@ -136,7 +98,74 @@ const getawayToneClassMap = {
   mint: "bg-secondary-soft text-base-white",
 } as const;
 
-export default function KarirPage() {
+type ResourceCardConfig = {
+  title: string;
+  description: string;
+  meta: string;
+  badge: string;
+  badgeTone: keyof typeof resourceBadgeClassMap;
+  icon: typeof FileText;
+  href: string | null;
+};
+
+function buildResourceCards(resourceLinks: CareerResources | null): ResourceCardConfig[] {
+  return [
+    {
+      title: "CV Templates",
+      description:
+        "Master template CV yang telah lulus sistem screening otomatis Big 4, Tech Giants, dan FMCG.",
+      meta: "6 template tersedia · DOC & PDF",
+      badge: "ATS",
+      badgeTone: "success",
+      icon: FileText,
+      href: resolveMediaUrl(resourceLinks?.cv_templates),
+    },
+    {
+      title: "Cover Letter",
+      description:
+        "Template cover letter profesional dengan struktur yang terbukti meningkatkan response rate hingga 3x lipat.",
+      meta: "4 template tersedia · DOC & PDF",
+      badge: "ATS",
+      badgeTone: "info",
+      icon: BadgeCheck,
+      href: resolveMediaUrl(resourceLinks?.cover_letter),
+    },
+    {
+      title: "Portfolio Guide",
+      description:
+        "Panduan menyusun portfolio berbasis hasil untuk jalur manajerial dan spesialis.",
+      meta: "2 framework tersedia · PDF",
+      badge: "Guide",
+      badgeTone: "lavender",
+      icon: NotebookText,
+      href: resolveMediaUrl(resourceLinks?.portfolio_guide),
+    },
+    {
+      title: "Salary Script",
+      description:
+        "Skrip negosiasi gaji dan kompensasi yang efektif untuk fresh graduate dan career switcher.",
+      meta: "3 skenario tersedia · PDF",
+      badge: "Hot",
+      badgeTone: "warning",
+      icon: CircleDollarSign,
+      href: resolveMediaUrl(resourceLinks?.salary_script),
+    },
+  ];
+}
+
+export default async function KarirPage() {
+  let resourceLinks: CareerResources | null = null;
+
+  try {
+    const response = await getCareerResources();
+    resourceLinks = response.data;
+  } catch {
+    resourceLinks = null;
+  }
+
+  const resources = buildResourceCards(resourceLinks);
+  const caseStudyHref = resolveMediaUrl(resourceLinks?.case_study_interview_prep);
+
   return (
     <div className="min-h-screen bg-base-white text-primary">
       <ScrollReset />
@@ -192,6 +221,7 @@ export default function KarirPage() {
             <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
               {resources.map((resource) => {
                 const Icon = resource.icon;
+                const isAvailable = Boolean(resource.href);
 
                 return (
                   <article
@@ -225,11 +255,19 @@ export default function KarirPage() {
                     </div>
 
                     <a
-                      href="#"
-                      className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-primary px-4 font-tagline text-[14px] font-semibold !text-white transition hover:brightness-110 [&_svg]:!text-white"
+                      href={resource.href ?? "#"}
+                      target={isAvailable ? "_blank" : undefined}
+                      rel={isAvailable ? "noreferrer" : undefined}
+                      aria-disabled={!isAvailable}
+                      className={[
+                        "mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-[10px] px-4 font-tagline text-[14px] font-semibold [&_svg]:!text-white",
+                        isAvailable
+                          ? "bg-primary !text-white transition hover:brightness-110"
+                          : "cursor-not-allowed bg-[#cbd5e1] !text-white",
+                      ].join(" ")}
                     >
                       <Download className="h-4 w-4" />
-                      Download
+                      {isAvailable ? "Buka Resource" : "Belum Tersedia"}
                     </a>
                   </article>
                 );
@@ -254,11 +292,19 @@ export default function KarirPage() {
                 </div>
 
                 <a
-                  href="#"
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-primary px-5 font-tagline text-[14px] font-semibold !text-white transition hover:brightness-110 [&_svg]:!text-white"
+                  href={caseStudyHref ?? "#"}
+                  target={caseStudyHref ? "_blank" : undefined}
+                  rel={caseStudyHref ? "noreferrer" : undefined}
+                  aria-disabled={!caseStudyHref}
+                  className={[
+                    "inline-flex h-11 items-center justify-center gap-2 rounded-[10px] px-5 font-tagline text-[14px] font-semibold [&_svg]:!text-white",
+                    caseStudyHref
+                      ? "bg-primary !text-white transition hover:brightness-110"
+                      : "cursor-not-allowed bg-[#cbd5e1] !text-white",
+                  ].join(" ")}
                 >
                   <Sparkles className="h-4 w-4" />
-                  Akses Sekarang
+                  {caseStudyHref ? "Akses Sekarang" : "Belum Tersedia"}
                 </a>
               </div>
             </div>

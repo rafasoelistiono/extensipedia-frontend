@@ -64,7 +64,6 @@ export function FeaturedAspirationsSection({
                 title={item.title}
                 shortDescription={item.short_description}
                 senderName={item.sender_name}
-                ticketId={item.ticket_id}
                 status={item.status}
                 visibility={item.visibility}
                 upvoteCount={item.upvote_count}

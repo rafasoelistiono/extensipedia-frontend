@@ -200,7 +200,7 @@ export function SupportHub({ activeTab, aspirations }: SupportHubProps) {
       <section className="relative overflow-hidden bg-primary">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/about/hero-bg.png"
+          src="/headers/header-advokasi.jpg"
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-25"
         />

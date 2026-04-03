@@ -5,10 +5,11 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
   ChevronDown,
   Funnel,
   Search,
-  Star,
 } from "lucide-react";
 import { CompetitionCard } from "@/components/hub-page/CompetitionCard";
 import type { CompetencyAgendaItem } from "@/lib/public-api";
@@ -23,6 +24,16 @@ type CompetencyHubClientProps = {
 };
 
 const ITEMS_PER_PAGE = 6;
+const winnerGallery = [
+  {
+    src: "/competency/winner-1.jpg",
+    alt: "Mahasiswa Extensi FEB UI meraih penghargaan kompetisi",
+  },
+  {
+    src: "/competency/winner-2.jpg",
+    alt: "Tim mahasiswa Extensi FEB UI menerima pengakuan kompetisi",
+  },
+] as const;
 
 const monthFormatter = new Intl.DateTimeFormat("id-ID", { month: "long" });
 
@@ -58,6 +69,7 @@ export function CompetencyHubClient({ items }: CompetencyHubClientProps) {
   const [urgencyOnly, setUrgencyOnly] = useState(false);
   const [recommendationOnly, setRecommendationOnly] = useState(false);
   const [page, setPage] = useState(1);
+  const [winnerSlide, setWinnerSlide] = useState(0);
 
   const yearOptions = useMemo(() => getYearOptions(items), [items]);
   const monthOptions = useMemo(() => getMonthOptions(items), [items]);
@@ -129,6 +141,7 @@ export function CompetencyHubClient({ items }: CompetencyHubClientProps) {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
+  const activeWinner = winnerGallery[winnerSlide];
 
   const chips = [
     {
@@ -439,31 +452,62 @@ export function CompetencyHubClient({ items }: CompetencyHubClientProps) {
         </div>
       </section>
 
-      <section className="bg-base-white px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8 lg:pb-20">
+      <section className="bg-base-white px-4 pb-8 sm:px-6 sm:pb-10 lg:px-8 lg:pb-12">
         <div className="mx-auto max-w-[1271px] rounded-[20px] border border-[#d0e1ec] bg-[#e8f4fd] p-3 sm:p-4 lg:rounded-[24px] lg:px-[43px] lg:py-[26px]">
           <div className="flex flex-col gap-4">
-            <div className="relative min-h-[180px] overflow-hidden rounded-[14px] bg-primary p-4 sm:min-h-[220px] sm:p-5 lg:min-h-[250px] lg:rounded-[10px] lg:p-[14px]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(91,181,225,0.16),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0))]" />
-              <Star className="relative h-7 w-7 fill-cta text-cta" />
+            <div className="relative mx-auto aspect-video w-full max-w-[640px] overflow-hidden rounded-[14px] bg-primary lg:mx-0 lg:max-w-[720px] lg:rounded-[10px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={activeWinner.src}
+                alt={activeWinner.alt}
+                className="h-full w-full object-contain"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(3,57,93,0.12),rgba(3,57,93,0.18))]" />
+
+              <button
+                type="button"
+                onClick={() =>
+                  setWinnerSlide((current) =>
+                    current === 0 ? winnerGallery.length - 1 : current - 1,
+                  )
+                }
+                aria-label="Lihat foto pemenang sebelumnya"
+                className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-base-white/90 text-primary shadow-md transition hover:scale-105"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setWinnerSlide((current) =>
+                    current === winnerGallery.length - 1 ? 0 : current + 1,
+                  )
+                }
+                aria-label="Lihat foto pemenang berikutnya"
+                className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-base-white/90 text-primary shadow-md transition hover:scale-105"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
             </div>
 
             <div className="flex flex-col gap-4 rounded-[18px] border border-primary bg-[#dbe9f5] px-4 py-4 sm:px-5 lg:flex-row lg:items-center lg:justify-between lg:rounded-[20px] lg:px-5">
               <div className="max-w-[663px]">
                 <h2 className="section-title text-[20px] leading-tight">
-                  Meet Our Previous Winners
+                  Won Something? Let Us Know
                 </h2>
                 <p className="mt-1 text-[14px] leading-6 text-copy-soft sm:text-[16px]">
-                  Get inspired by last year&apos;s winners. Think you have what it
-                  takes?
+                  If you or your team just won an award or received recognition,
+                  send it our way so we can celebrate it.
                 </p>
               </div>
 
               <button
                 type="button"
                 className="inline-flex h-10 items-center justify-center gap-2 self-start rounded-[10px] bg-primary px-4 font-tagline text-[14px] font-semibold text-base-white sm:text-[15px] lg:w-[225px]"
-                aria-label="Lihat Pemenang"
+                aria-label="Notify Us"
               >
-                <span>Lihat Pemenang</span>
+                <span>Notify Us</span>
                 <ArrowUpRight className="h-4 w-4" />
               </button>
             </div>

@@ -95,7 +95,7 @@ export default async function AkademikPage() {
         <HeroBanner
           title="Akademik Hub"
           description="Pusat sumber daya akademik terpadu untuk mahasiswa Program Ekstensi Fakultas Ekonomi dan Bisnis Universitas Indonesia. Akses bahan kuliah, informasi kompetisi, dan layanan aspirasi dalam satu platform."
-          backgroundImage="/about/hero-bg.png"
+          backgroundImage="/headers/header-akademik.jpg"
           breadcrumbs={[
             { label: "Beranda", href: "/" },
             { label: "Akademik" },

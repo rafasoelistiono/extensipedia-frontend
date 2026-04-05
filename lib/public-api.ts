@@ -68,6 +68,14 @@ export type CompetencyAgendaItem = {
   countdown_days: number;
 };
 
+export type CompetencyWinnerSlide = {
+  id: string;
+  image_url: string;
+  alt_text: string;
+  display_order: number;
+  updated_at: string;
+};
+
 export type CareerResources = {
   id: string;
   cv_templates: string;
@@ -190,6 +198,18 @@ export async function getCompetencyAgendas(query?: {
 }) {
   return request<ApiResponse<Paginated<CompetencyAgendaItem>>>(
     "/api/v1/public/competency/agenda-cards/",
+    {},
+    query,
+  );
+}
+
+export async function getCompetencyWinnerSlides(query?: {
+  page?: number;
+  page_size?: number;
+  ordering?: string;
+}) {
+  return request<ApiResponse<Paginated<CompetencyWinnerSlide>>>(
+    "/api/v1/public/competency/winner-slides/",
     {},
     query,
   );

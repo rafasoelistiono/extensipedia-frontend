@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoaderCircle, Megaphone, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
@@ -17,6 +17,12 @@ type SubmitResponse = {
   };
 };
 
+const submittingSteps = [
+  "Menyimpan form aspirasi ke sistem.",
+  "Meminta backend membuat ticket ID.",
+  "Menunggu respons akhir atau pesan error dari server.",
+] as const;
+
 export function AspirationSubmitForm() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">(
     "idle",
@@ -24,6 +30,20 @@ export function AspirationSubmitForm() {
   const [message, setMessage] = useState("");
   const [ticketId, setTicketId] = useState<string | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [loadingStep, setLoadingStep] = useState(0);
+
+  useEffect(() => {
+    if (status !== "submitting") {
+      setLoadingStep(0);
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setLoadingStep((current) => (current + 1) % submittingSteps.length);
+    }, 1400);
+
+    return () => window.clearInterval(interval);
+  }, [status]);
 
   async function handleSubmit(formData: FormData) {
     setStatus("submitting");
@@ -160,8 +180,30 @@ export function AspirationSubmitForm() {
             </label>
           </div>
 
+          {status === "submitting" ? (
+            <div
+              aria-live="polite"
+              className="rounded-[14px] border border-[#bfd7ea] bg-[#eef7fd] px-4 py-4 text-[14px] text-primary"
+            >
+              <div className="flex items-center gap-3">
+                <LoaderCircle className="h-5 w-5 animate-spin text-primary" />
+                <p className="font-tagline text-[14px] font-semibold">
+                  Aspirasi sedang diproses
+                </p>
+              </div>
+              <p className="mt-2 leading-6 text-copy-soft">{submittingSteps[loadingStep]}</p>
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#d7e8f5]">
+                <div
+                  className="h-full w-1/2 animate-pulse rounded-full bg-primary"
+                  style={{ transform: `translateX(${loadingStep * 50}%)` }}
+                />
+              </div>
+            </div>
+          ) : null}
+
           {message && status !== "submitting" ? (
             <div
+              aria-live="polite"
               className={[
                 "rounded-[10px] px-4 py-3 text-[14px]",
                 status === "success"
@@ -182,19 +224,35 @@ export function AspirationSubmitForm() {
             className="h-11 w-full justify-center rounded-[10px] text-[14px] disabled:cursor-not-allowed disabled:opacity-60"
             disabled={status === "submitting"}
           >
-            Kirim Aspirasi
+            {status === "submitting" ? "Mengirim Aspirasi..." : "Kirim Aspirasi"}
           </Button>
         </fieldset>
 
         {status === "submitting" ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center rounded-b-[20px] bg-base-white/88 px-6 text-center backdrop-blur-[2px]">
-            <LoaderCircle className="h-9 w-9 animate-spin text-primary" />
-            <p className="mt-4 font-tagline text-[16px] font-semibold text-primary">
-              Sedang mengirim aspirasi
-            </p>
-            <p className="mt-2 max-w-[420px] text-[14px] leading-6 text-copy-soft">
-              Mohon tunggu sampai ticket berhasil tergenerate dan notifikasi email selesai diproses.
-            </p>
+          <div className="absolute inset-0 flex items-center justify-center rounded-b-[20px] bg-primary/12 px-6 backdrop-blur-[3px]">
+            <div className="w-full max-w-[420px] rounded-[18px] border border-[#bfd7ea] bg-base-white px-6 py-6 text-center shadow-[0_18px_48px_rgba(3,57,93,0.18)]">
+              <LoaderCircle className="mx-auto h-10 w-10 animate-spin text-primary" />
+              <p className="mt-4 font-tagline text-[17px] font-semibold text-primary">
+                Sedang mengirim aspirasi
+              </p>
+              <p className="mt-2 text-[14px] leading-6 text-copy-soft">
+                Mohon tunggu sampai ticket ID berhasil dibuat atau sistem mengembalikan pesan error.
+              </p>
+              <div className="mt-5 flex items-center justify-center gap-2">
+                {submittingSteps.map((step, index) => (
+                  <span
+                    key={step}
+                    className={[
+                      "h-2.5 rounded-full transition-all duration-300",
+                      index === loadingStep ? "w-8 bg-primary" : "w-2.5 bg-[#c8dcec]",
+                    ].join(" ")}
+                  />
+                ))}
+              </div>
+              <p className="mt-4 text-[13px] leading-6 text-copy-soft">
+                {submittingSteps[loadingStep]}
+              </p>
+            </div>
           </div>
         ) : null}
       </form>

@@ -12,7 +12,11 @@ import {
   Search,
 } from "lucide-react";
 import { CompetitionCard } from "@/components/hub-page/CompetitionCard";
-import type { CompetencyAgendaItem } from "@/lib/public-api";
+import {
+  resolveMediaUrl,
+  type CompetencyAgendaItem,
+  type CompetencyWinnerSlide,
+} from "@/lib/public-api";
 import {
   competencyDeadlineFormatter,
   getCompetencyCountdownLabel,
@@ -21,19 +25,10 @@ import {
 
 type CompetencyHubClientProps = {
   items: CompetencyAgendaItem[];
+  winnerSlides: CompetencyWinnerSlide[];
 };
 
 const ITEMS_PER_PAGE = 6;
-const winnerGallery = [
-  {
-    src: "/competency/winner-1.jpg",
-    alt: "Mahasiswa Extensi FEB UI meraih penghargaan kompetisi",
-  },
-  {
-    src: "/competency/winner-2.jpg",
-    alt: "Tim mahasiswa Extensi FEB UI menerima pengakuan kompetisi",
-  },
-] as const;
 
 const monthFormatter = new Intl.DateTimeFormat("id-ID", { month: "long" });
 
@@ -59,7 +54,10 @@ function getMonthOptions(items: CompetencyAgendaItem[]) {
   ).sort((left, right) => Number(left) - Number(right));
 }
 
-export function CompetencyHubClient({ items }: CompetencyHubClientProps) {
+export function CompetencyHubClient({
+  items,
+  winnerSlides,
+}: CompetencyHubClientProps) {
   const [search, setSearch] = useState("");
   const [selectedYear, setSelectedYear] = useState("all");
   const [selectedMonth, setSelectedMonth] = useState("all");
@@ -141,7 +139,10 @@ export function CompetencyHubClient({ items }: CompetencyHubClientProps) {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
-  const activeWinner = winnerGallery[winnerSlide];
+  const safeWinnerSlide =
+    winnerSlides.length > 0 ? winnerSlide % winnerSlides.length : 0;
+  const activeWinner = winnerSlides[safeWinnerSlide];
+  const activeWinnerImageUrl = resolveMediaUrl(activeWinner?.image_url);
 
   const chips = [
     {
@@ -455,40 +456,54 @@ export function CompetencyHubClient({ items }: CompetencyHubClientProps) {
       <section className="bg-base-white px-4 pb-8 sm:px-6 sm:pb-10 lg:px-8 lg:pb-12">
         <div className="mx-auto max-w-[1271px] rounded-[20px] border border-[#d0e1ec] bg-[#e8f4fd] p-3 sm:p-4 lg:rounded-[24px] lg:px-[43px] lg:py-[26px]">
           <div className="flex flex-col gap-4">
-            <div className="relative mx-auto aspect-video w-full max-w-[640px] overflow-hidden rounded-[14px] bg-primary lg:mx-0 lg:max-w-[720px] lg:rounded-[10px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={activeWinner.src}
-                alt={activeWinner.alt}
-                className="h-full w-full object-contain"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(3,57,93,0.12),rgba(3,57,93,0.18))]" />
+            <div className="relative mx-auto flex aspect-video w-full max-w-[640px] items-center justify-center overflow-hidden rounded-[14px] bg-primary lg:max-w-[720px] lg:rounded-[10px]">
+              {activeWinnerImageUrl ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={activeWinnerImageUrl}
+                    alt={activeWinner.alt_text}
+                    className="h-full w-full object-contain object-center"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(3,57,93,0.12),rgba(3,57,93,0.18))]" />
+                </>
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-surface-subtle px-6 text-center">
+                  <p className="max-w-[360px] font-tagline text-[14px] text-copy-soft sm:text-[15px]">
+                    Winner slide belum tersedia dari backend.
+                  </p>
+                </div>
+              )}
 
-              <button
-                type="button"
-                onClick={() =>
-                  setWinnerSlide((current) =>
-                    current === 0 ? winnerGallery.length - 1 : current - 1,
-                  )
-                }
-                aria-label="Lihat foto pemenang sebelumnya"
-                className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-base-white/90 text-primary shadow-md transition hover:scale-105"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
+              {winnerSlides.length > 1 ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setWinnerSlide((current) =>
+                        current === 0 ? winnerSlides.length - 1 : current - 1,
+                      )
+                    }
+                    aria-label="Lihat foto pemenang sebelumnya"
+                    className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-base-white/90 text-primary shadow-md transition hover:scale-105"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
 
-              <button
-                type="button"
-                onClick={() =>
-                  setWinnerSlide((current) =>
-                    current === winnerGallery.length - 1 ? 0 : current + 1,
-                  )
-                }
-                aria-label="Lihat foto pemenang berikutnya"
-                className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-base-white/90 text-primary shadow-md transition hover:scale-105"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setWinnerSlide((current) =>
+                        current === winnerSlides.length - 1 ? 0 : current + 1,
+                      )
+                    }
+                    aria-label="Lihat foto pemenang berikutnya"
+                    className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-base-white/90 text-primary shadow-md transition hover:scale-105"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </>
+              ) : null}
             </div>
 
             <div className="flex flex-col gap-4 rounded-[18px] border border-primary bg-[#dbe9f5] px-4 py-4 sm:px-5 lg:flex-row lg:items-center lg:justify-between lg:rounded-[20px] lg:px-5">

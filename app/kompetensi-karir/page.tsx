@@ -4,7 +4,12 @@ import { Navbar } from "@/components/Navbar";
 import { ScrollReset } from "@/components/ScrollReset";
 import { CompetencyHubClient } from "@/components/hub-page/CompetencyHubClient";
 import { HeroBanner } from "@/components/hub-page/HeroBanner";
-import { getCompetencyAgendas, type CompetencyAgendaItem } from "@/lib/public-api";
+import {
+  getCompetencyAgendas,
+  getCompetencyWinnerSlides,
+  type CompetencyAgendaItem,
+  type CompetencyWinnerSlide,
+} from "@/lib/public-api";
 
 export const metadata: Metadata = {
   title: "Kompetensi & Karir Hub | Extensipedia",
@@ -12,15 +17,25 @@ export const metadata: Metadata = {
 
 export default async function KompetensiKarirPage() {
   let items: CompetencyAgendaItem[] = [];
+  let winnerSlides: CompetencyWinnerSlide[] = [];
 
   try {
-    const response = await getCompetencyAgendas({
-      page_size: 50,
-      ordering: "-created_at,-updated_at,deadline_date,title",
-    });
-    items = response.data.items;
+    const [agendasResponse, winnerSlidesResponse] = await Promise.all([
+      getCompetencyAgendas({
+        page_size: 50,
+        ordering: "-created_at,-updated_at,deadline_date,title",
+      }),
+      getCompetencyWinnerSlides({
+        page_size: 10,
+        ordering: "display_order,updated_at",
+      }),
+    ]);
+
+    items = agendasResponse.data.items;
+    winnerSlides = winnerSlidesResponse.data.items;
   } catch {
     items = [];
+    winnerSlides = [];
   }
 
   return (
@@ -48,7 +63,7 @@ export default async function KompetensiKarirPage() {
           ]}
         />
 
-        <CompetencyHubClient items={items} />
+        <CompetencyHubClient items={items} winnerSlides={winnerSlides} />
       </main>
 
       <Footer />

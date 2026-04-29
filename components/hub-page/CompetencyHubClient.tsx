@@ -459,7 +459,7 @@ const activeWinnerImageUrl = activeWinner?.image_url ?? "";
           ) : (
             <div className="rounded-[24px] border border-dashed border-panel-border bg-surface-subtle px-6 py-12 text-center">
               <p className="font-headline text-[28px] text-primary">
-                Belum ada berita kompetensi.
+                Belum ada berita kompetisi.
               </p>
               <p className="mx-auto mt-3 max-w-[620px] text-[15px] leading-7 text-copy-soft">
                 Data agenda dari backend belum tersedia atau tidak ada yang cocok
@@ -473,7 +473,7 @@ const activeWinnerImageUrl = activeWinner?.image_url ?? "";
       <section className="bg-base-white px-4 pb-8 sm:px-6 sm:pb-10 lg:px-8 lg:pb-12">
         <div className="mx-auto max-w-[1271px] rounded-[20px] border border-[#d0e1ec] bg-[#e8f4fd] p-3 sm:p-4 lg:rounded-[24px] lg:px-[43px] lg:py-[26px]">
           <div className="flex flex-col gap-4">
-            <div className="relative mx-auto flex aspect-video w-full max-w-[640px] items-center justify-center overflow-hidden rounded-[14px] bg-primary lg:max-w-[720px] lg:rounded-[10px]">
+            <div className="relative mx-auto flex aspect-square w-full max-w-[640px] items-center justify-center overflow-hidden rounded-[14px] bg-primary lg:max-w-[720px] lg:rounded-[10px]">
               {activeWinnerImageUrl ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}

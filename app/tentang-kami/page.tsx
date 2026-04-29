@@ -68,7 +68,8 @@ const organizationMembers = [
     name: "Cameliah Hamdani",
     role: "Kepala Departemen",
     unit: "Pengembangan Karir",
-    image: "/about/cameliah-hamdani.png",
+    image: "/about/Cameliah.png",
+    imageClassName: "h-[134px]",
   },
   {
     name: "Ratu Zahra Savira",
@@ -93,6 +94,22 @@ const organizationMembers = [
     role: "Kepala Departemen",
     unit: "Publikasi & Dokumentasi",
     image: "/about/raja-sultan-syah.png",
+  },
+  {
+    name: "Dede Firmansah",
+    role: "Kepala Departemen",
+    unit: "Pendidikan & Teknologi Informasi",
+    image: "/about/dede-firmansah.png",
+  },{
+    name: "Sola Gratia Vinola",
+    role: "Kepala Departemen",
+    unit: "Kajian & Aksi Strategis",
+    image: "/about/sola-gratia.png",
+  },{
+    name: "Ikfina Nur Aini",
+    role: "Kepala Departemen",
+    unit: "Internal & Advokasi Mahasiswa",
+    image: "/about/ikfina-nur.png",
   },
 ];
 
@@ -495,6 +512,30 @@ export default async function TentangKamiPage() {
                 </div>
               )}
             </div>
+          </div>
+        </section>
+
+        <section className="bg-base-white py-[60px]">
+          <div className="mx-auto w-full max-w-[1213px] px-4 sm:px-6 lg:px-8">
+            <SectionHeader
+              eyebrow="Nilai Utama"
+              title="Filosofi Slogan"
+              align="center"
+            />
+
+            <article className="mx-auto mt-8 max-w-[980px] rounded-[28px] border border-panel-border bg-[linear-gradient(180deg,#f9fcff_0%,#eef6fc_100%)] px-6 py-8 text-primary shadow-[0_14px_40px_rgba(3,57,93,0.12)] sm:mt-10 sm:px-10 sm:py-10 lg:px-12 lg:py-12">
+              <p className="mt-6 font-headline text-[28px] leading-none text-cta sm:text-[36px] lg:text-[44px]">
+                Gaungkan asa, wujudkan cita.
+              </p>
+
+              <p className="mt-5 font-body text-[14px] leading-[1.85] text-muted sm:text-[16px] sm:leading-[1.9]">
+                Slogan ini adalah janji kami bahwa setiap harapan (Asa)
+                mahasiswa tidak akan dibiarkan sunyi. Melalui langkah konkret
+                dan kolaborasi, kami akan memperkuat (Gaungkan) suara tersebut
+                menjadi kekuatan nyata untuk merealisasikan setiap impian
+                (Cita) mahasiswa Ekstensi FEB UI.
+              </p>
+            </article>
           </div>
         </section>
       </main>

@@ -10,6 +10,7 @@ type OrganizationMember = {
   role: string;
   unit: string;
   image: string;
+  imageClassName?: string;
 };
 
 type OrganizationCarouselProps = {

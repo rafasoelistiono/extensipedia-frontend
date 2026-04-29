@@ -141,7 +141,7 @@ export default async function Home() {
           ) : (
             <div className="mt-6 rounded-[24px] border border-dashed border-panel-border bg-surface-subtle px-6 py-12 text-center">
               <p className="font-headline text-[28px] text-primary">
-                Belum ada update kompetensi.
+                Belum ada update kompetisi.
               </p>
               <p className="mx-auto mt-3 max-w-[620px] text-[15px] leading-7 text-copy-soft">
                 Data agenda kompetensi belum tersedia dari backend. Lihat halaman

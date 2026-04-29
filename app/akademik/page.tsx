@@ -28,6 +28,58 @@ export const metadata: Metadata = {
   title: "Akademik Hub | Extensipedia",
 };
 
+function ArrowMark() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M5 12H19M19 12L13 6M19 12L13 18"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function PaletteMark() {
+  return (
+    <svg width="41" height="41" viewBox="0 0 41 41" fill="none" aria-hidden="true">
+      <path
+        d="M20.5 5.2c-8.5 0-15.3 6.2-15.3 13.9 0 4.6 3.2 8.3 7.1 8.3h2.1c1.1 0 2 .9 2 2 0 3 2.2 5.5 5 5.5 8 0 14.4-6 14.4-13.4C35.8 12.5 29 5.2 20.5 5.2Z"
+        stroke="#833AF0"
+        strokeWidth="2.4"
+        strokeLinejoin="round"
+      />
+      <circle cx="14.2" cy="15.1" r="1.7" fill="#833AF0" />
+      <circle cx="22.2" cy="12.6" r="1.7" fill="#833AF0" />
+      <circle cx="26.4" cy="19.6" r="1.7" fill="#833AF0" />
+      <circle cx="16.7" cy="22.5" r="1.7" fill="#833AF0" />
+    </svg>
+  );
+}
+
+function SparkleMark() {
+  return (
+    <svg width="41" height="41" viewBox="0 0 41 41" fill="none" aria-hidden="true">
+      <path
+        d="M20.5 8.2L23.9 16.8L32.5 20.2L23.9 23.6L20.5 32.2L17.1 23.6L8.5 20.2L17.1 16.8L20.5 8.2Z"
+        stroke="#5182ED"
+        strokeWidth="2.4"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M30.2 8.2L31.4 11.2L34.5 12.4L31.4 13.6L30.2 16.6L29 13.6L26 12.4L29 11.2L30.2 8.2Z"
+        fill="#5182ED"
+      />
+      <path
+        d="M11.8 26.6L12.7 28.8L14.9 29.7L12.7 30.6L11.8 32.8L10.9 30.6L8.7 29.7L10.9 28.8L11.8 26.6Z"
+        fill="#5182ED"
+      />
+    </svg>
+  );
+}
+
 function mapRepositoryItems(items: AcademicRepositoryMaterial[]) {
   return items
     .slice()
@@ -237,6 +289,237 @@ export default async function AkademikPage() {
                 items={mapRepositoryItems(repository.manajemen)}
                 tone="blue"
               />
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-base-white px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-[1213px]">
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+              }}
+            >
+              <p
+                className="font-tagline text-cta"
+                style={{
+                  fontSize: "20px",
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  textTransform: "uppercase",
+                }}
+              >
+                Layanan Eksklusif
+              </p>
+              <h2
+                className="font-headline text-primary"
+                style={{
+                  maxWidth: "640px",
+                  fontSize: "48px",
+                  lineHeight: 1,
+                }}
+              >
+                Layanan Penunjang Digital
+              </h2>
+              <p
+                className="font-body text-primary"
+                style={{
+                  fontSize: "16px",
+                  lineHeight: 1,
+                }}
+              >
+                Tingkatkan produktivitas akademikmu dengan akses eksklusif
+              </p>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                gap: "53px",
+                marginTop: "50px",
+              }}
+            >
+              <article
+                className="bg-base-white"
+                style={{
+                  minHeight: "200px",
+                  borderRadius: "20px",
+                  border: "5px solid #833af0",
+                  boxShadow: "0 4px 8.5px rgba(0,0,0,0.15)",
+                  padding: "29px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "15px" }}>
+                  <div
+                    style={{
+                      width: "71px",
+                      height: "71px",
+                      borderRadius: "19.722px",
+                      backgroundColor: "#faf5ff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <PaletteMark />
+                  </div>
+
+                  <div
+                    style={{
+                      flex: 1,
+                      minHeight: "159px",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: "15px",
+                      paddingTop: "15px",
+                      paddingBottom: "15px",
+                    }}
+                  >
+                    <h3
+                      className="font-tagline"
+                      style={{
+                        width: "289px",
+                        color: "#000",
+                        fontSize: "26px",
+                        fontWeight: 450,
+                        lineHeight: 1,
+                      }}
+                    >
+                      Canva Pro Ekstensi
+                    </h3>
+                    <p
+                      className="font-body"
+                      style={{
+                        maxWidth: "423px",
+                        color: "#616161",
+                        fontSize: "16px",
+                        lineHeight: 1,
+                      }}
+                    >
+                      Akses lisensi kolektif Canva Pro untuk kebutuhan
+                      presentasi dan desain tugas kuliah.
+                    </p>
+
+                    <a
+                      href="#"
+                      className="font-tagline"
+                      style={{
+                        marginTop: "auto",
+                        width: "303px",
+                        height: "53px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "12px",
+                        borderRadius: "10px",
+                        background:
+                          "linear-gradient(90deg, #823cf8 0%, #9747ff 100%)",
+                        color: "#fff",
+                        fontSize: "24px",
+                        fontWeight: 450,
+                        lineHeight: 1,
+                      }}
+                    >
+                      Daftar Sekarang
+                      <ArrowMark />
+                    </a>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                className="bg-base-white"
+                style={{
+                  minHeight: "200px",
+                  borderRadius: "20px",
+                  border: "5px solid #5182ed",
+                  boxShadow: "0 4px 8.5px rgba(0,0,0,0.15)",
+                  padding: "29px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "15px" }}>
+                  <div
+                    style={{
+                      width: "71px",
+                      height: "71px",
+                      borderRadius: "19.722px",
+                      backgroundColor: "#eff6ff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <SparkleMark />
+                  </div>
+
+                  <div
+                    style={{
+                      flex: 1,
+                      minHeight: "159px",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: "15px",
+                      paddingTop: "15px",
+                      paddingBottom: "15px",
+                    }}
+                  >
+                    <h3
+                      className="font-tagline"
+                      style={{
+                        width: "289px",
+                        color: "#000",
+                        fontSize: "26px",
+                        fontWeight: 450,
+                        lineHeight: 1,
+                      }}
+                    >
+                      Gemini Advanced
+                    </h3>
+                    <p
+                      className="font-body"
+                      style={{
+                        maxWidth: "423px",
+                        color: "#616161",
+                        fontSize: "16px",
+                        lineHeight: 1,
+                      }}
+                    >
+                      Gabung slot family sharing untuk akses AI Gemini
+                      Advanced sebagai asisten riset dan belajar.
+                    </p>
+
+                    <a
+                      href="#"
+                      className="font-tagline"
+                      style={{
+                        marginTop: "auto",
+                        width: "303px",
+                        height: "53px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "12px",
+                        borderRadius: "10px",
+                        background: "#000",
+                        color: "#fff",
+                        fontSize: "24px",
+                        fontWeight: 450,
+                        lineHeight: 1,
+                      }}
+                    >
+                      Gabung Slot
+                      <ArrowMark />
+                    </a>
+                  </div>
+                </div>
+              </article>
             </div>
           </div>
         </section>

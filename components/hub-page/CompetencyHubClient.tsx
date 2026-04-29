@@ -139,10 +139,27 @@ export function CompetencyHubClient({
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
-  const safeWinnerSlide =
-    winnerSlides.length > 0 ? winnerSlide % winnerSlides.length : 0;
-  const activeWinner = winnerSlides[safeWinnerSlide];
-  const activeWinnerImageUrl = resolveMediaUrl(activeWinner?.image_url);
+  
+  const localWinnerSlides = [
+  {
+    image_url: "/competency/winner-1.png",
+    alt_text: "Winner slide 1",
+  },
+  {
+    image_url: "/competency/winner-2.png",
+    alt_text: "Winner slide 2",
+  },
+];
+
+const displayedWinnerSlides = localWinnerSlides;
+
+const safeWinnerSlide =
+  displayedWinnerSlides.length > 0
+    ? winnerSlide % displayedWinnerSlides.length
+    : 0;
+
+const activeWinner = displayedWinnerSlides[safeWinnerSlide];
+const activeWinnerImageUrl = activeWinner?.image_url ?? "";
 
   const chips = [
     {
@@ -462,7 +479,7 @@ export function CompetencyHubClient({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={activeWinnerImageUrl}
-                    alt={activeWinner.alt_text}
+                    alt={activeWinner?.alt_text ?? "Winner slide"}
                     className="h-full w-full object-contain object-center"
                   />
                   <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(3,57,93,0.12),rgba(3,57,93,0.18))]" />
@@ -470,18 +487,18 @@ export function CompetencyHubClient({
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-surface-subtle px-6 text-center">
                   <p className="max-w-[360px] font-tagline text-[14px] text-copy-soft sm:text-[15px]">
-                    Winner slide belum tersedia dari backend.
+                    Winner slide belum tersedia.
                   </p>
                 </div>
               )}
 
-              {winnerSlides.length > 1 ? (
+              {displayedWinnerSlides.length > 1 ? (
                 <>
                   <button
                     type="button"
                     onClick={() =>
                       setWinnerSlide((current) =>
-                        current === 0 ? winnerSlides.length - 1 : current - 1,
+                        current === 0 ? displayedWinnerSlides.length - 1 : current - 1,
                       )
                     }
                     aria-label="Lihat foto pemenang sebelumnya"
@@ -494,7 +511,7 @@ export function CompetencyHubClient({
                     type="button"
                     onClick={() =>
                       setWinnerSlide((current) =>
-                        current === winnerSlides.length - 1 ? 0 : current + 1,
+                        current === displayedWinnerSlides.length - 1 ? 0 : current + 1,
                       )
                     }
                     aria-label="Lihat foto pemenang berikutnya"

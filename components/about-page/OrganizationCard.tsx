@@ -5,6 +5,7 @@ type OrganizationCardProps = {
   role: string;
   unit: string;
   image: string;
+  imageClassName?: string;
 };
 
 export function OrganizationCard({
@@ -12,6 +13,7 @@ export function OrganizationCard({
   role,
   unit,
   image,
+  imageClassName,
 }: OrganizationCardProps) {
   return (
     <article className="surface-card flex min-h-[298px] w-[282px] shrink-0 flex-col items-center rounded-[13px] border border-panel-border px-[10px] py-[30px]">
@@ -21,7 +23,10 @@ export function OrganizationCard({
           src={image}
           alt={name}
           loading="lazy"
-          className="pointer-events-none absolute bottom-0 left-1/2 h-[150px] w-auto max-w-none -translate-x-1/2 object-contain"
+          className={[
+            "pointer-events-none absolute bottom-0 left-1/2 h-[150px] w-auto max-w-none -translate-x-1/2 object-contain",
+            imageClassName ?? "",
+          ].join(" ")}
         />
       </div>
 

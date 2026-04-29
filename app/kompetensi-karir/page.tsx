@@ -47,7 +47,7 @@ export default async function KompetensiKarirPage() {
         <HeroBanner
           title="Kompetensi & Karir Hub"
           description="Ekosistem terpadu untuk mengembangkan kompetensi akademik dan mengakselerasi perjalanan karirmu sebagai mahasiswa Ekstensi FEB UI."
-          backgroundImage="/headers/header-kompetensi-karir.jpg"
+          backgroundImage="/headers/header-kompetisi-karir.png"
           breadcrumbs={[
             { label: "Beranda", href: "/" },
             { label: "Kompetensi & Karir" },

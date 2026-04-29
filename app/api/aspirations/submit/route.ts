@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { BASE_URL } from "@/lib/public-api";
 
 const SUBMIT_URL = `${BASE_URL}/api/v1/public/aspirations/submit/`;
+const SUBMIT_TIMEOUT_MS = 10_000;
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +37,7 @@ export async function POST(request: Request) {
       method: "POST",
       body: upstream,
       cache: "no-store",
+      signal: AbortSignal.timeout(SUBMIT_TIMEOUT_MS),
     });
 
     const raw = await response.text();

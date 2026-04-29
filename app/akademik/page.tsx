@@ -28,9 +28,11 @@ export const metadata: Metadata = {
   title: "Akademik Hub | Extensipedia",
 };
 
+export const revalidate = 120;
+
 function ArrowMark() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M5 12H19M19 12L13 6M19 12L13 18"
         stroke="currentColor"
@@ -44,7 +46,7 @@ function ArrowMark() {
 
 function PaletteMark() {
   return (
-    <svg width="41" height="41" viewBox="0 0 41 41" fill="none" aria-hidden="true">
+    <svg width="32" height="32" viewBox="0 0 41 41" fill="none" aria-hidden="true">
       <path
         d="M20.5 5.2c-8.5 0-15.3 6.2-15.3 13.9 0 4.6 3.2 8.3 7.1 8.3h2.1c1.1 0 2 .9 2 2 0 3 2.2 5.5 5 5.5 8 0 14.4-6 14.4-13.4C35.8 12.5 29 5.2 20.5 5.2Z"
         stroke="#833AF0"
@@ -61,7 +63,7 @@ function PaletteMark() {
 
 function SparkleMark() {
   return (
-    <svg width="41" height="41" viewBox="0 0 41 41" fill="none" aria-hidden="true">
+    <svg width="32" height="32" viewBox="0 0 41 41" fill="none" aria-hidden="true">
       <path
         d="M20.5 8.2L23.9 16.8L32.5 20.2L23.9 23.6L20.5 32.2L17.1 23.6L8.5 20.2L17.1 16.8L20.5 8.2Z"
         stroke="#5182ED"
@@ -317,7 +319,7 @@ export default async function AkademikPage() {
                 className="font-headline text-primary"
                 style={{
                   maxWidth: "640px",
-                  fontSize: "48px",
+                  fontSize: "clamp(34px, 7vw, 44px)",
                   lineHeight: 1,
                 }}
               >
@@ -326,8 +328,8 @@ export default async function AkademikPage() {
               <p
                 className="font-body text-primary"
                 style={{
-                  fontSize: "16px",
-                  lineHeight: 1,
+                  fontSize: "15px",
+                  lineHeight: 1.35,
                 }}
               >
                 Tingkatkan produktivitas akademikmu dengan akses eksklusif
@@ -336,28 +338,29 @@ export default async function AkademikPage() {
 
             <div
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                gap: "53px",
-                marginTop: "50px",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "24px",
+                marginTop: "32px",
               }}
             >
               <article
                 className="bg-base-white"
                 style={{
-                  minHeight: "200px",
-                  borderRadius: "20px",
-                  border: "5px solid #833af0",
+                  flex: "1 1 300px",
+                  minHeight: "170px",
+                  borderRadius: "16px",
+                  border: "3px solid #833af0",
                   boxShadow: "0 4px 8.5px rgba(0,0,0,0.15)",
-                  padding: "29px",
+                  padding: "20px",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "15px" }}>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                   <div
                     style={{
-                      width: "71px",
-                      height: "71px",
-                      borderRadius: "19.722px",
+                      width: "56px",
+                      height: "56px",
+                      borderRadius: "16px",
                       backgroundColor: "#faf5ff",
                       display: "flex",
                       alignItems: "center",
@@ -371,21 +374,20 @@ export default async function AkademikPage() {
                   <div
                     style={{
                       flex: 1,
-                      minHeight: "159px",
+                      minWidth: 0,
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "flex-start",
-                      gap: "15px",
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
+                      gap: "10px",
                     }}
                   >
                     <h3
                       className="font-tagline"
                       style={{
-                        width: "289px",
+                        width: "100%",
+                        maxWidth: "289px",
                         color: "#000",
-                        fontSize: "26px",
+                        fontSize: "22px",
                         fontWeight: 450,
                         lineHeight: 1,
                       }}
@@ -397,8 +399,8 @@ export default async function AkademikPage() {
                       style={{
                         maxWidth: "423px",
                         color: "#616161",
-                        fontSize: "16px",
-                        lineHeight: 1,
+                        fontSize: "15px",
+                        lineHeight: 1.3,
                       }}
                     >
                       Akses lisensi kolektif Canva Pro untuk kebutuhan
@@ -410,17 +412,17 @@ export default async function AkademikPage() {
                       className="font-tagline"
                       style={{
                         marginTop: "auto",
-                        width: "303px",
-                        height: "53px",
+                        width: "min(240px, 100%)",
+                        height: "44px",
                         display: "inline-flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        gap: "12px",
+                        gap: "8px",
                         borderRadius: "10px",
                         background:
                           "linear-gradient(90deg, #823cf8 0%, #9747ff 100%)",
                         color: "#fff",
-                        fontSize: "24px",
+                        fontSize: "18px",
                         fontWeight: 450,
                         lineHeight: 1,
                       }}
@@ -435,19 +437,20 @@ export default async function AkademikPage() {
               <article
                 className="bg-base-white"
                 style={{
-                  minHeight: "200px",
-                  borderRadius: "20px",
-                  border: "5px solid #5182ed",
+                  flex: "1 1 300px",
+                  minHeight: "170px",
+                  borderRadius: "16px",
+                  border: "3px solid #5182ed",
                   boxShadow: "0 4px 8.5px rgba(0,0,0,0.15)",
-                  padding: "29px",
+                  padding: "20px",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "15px" }}>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                   <div
                     style={{
-                      width: "71px",
-                      height: "71px",
-                      borderRadius: "19.722px",
+                      width: "56px",
+                      height: "56px",
+                      borderRadius: "16px",
                       backgroundColor: "#eff6ff",
                       display: "flex",
                       alignItems: "center",
@@ -461,21 +464,20 @@ export default async function AkademikPage() {
                   <div
                     style={{
                       flex: 1,
-                      minHeight: "159px",
+                      minWidth: 0,
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "flex-start",
-                      gap: "15px",
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
+                      gap: "10px",
                     }}
                   >
                     <h3
                       className="font-tagline"
                       style={{
-                        width: "289px",
+                        width: "100%",
+                        maxWidth: "289px",
                         color: "#000",
-                        fontSize: "26px",
+                        fontSize: "22px",
                         fontWeight: 450,
                         lineHeight: 1,
                       }}
@@ -487,8 +489,8 @@ export default async function AkademikPage() {
                       style={{
                         maxWidth: "423px",
                         color: "#616161",
-                        fontSize: "16px",
-                        lineHeight: 1,
+                        fontSize: "15px",
+                        lineHeight: 1.3,
                       }}
                     >
                       Gabung slot family sharing untuk akses AI Gemini
@@ -500,16 +502,16 @@ export default async function AkademikPage() {
                       className="font-tagline"
                       style={{
                         marginTop: "auto",
-                        width: "303px",
-                        height: "53px",
+                        width: "min(240px, 100%)",
+                        height: "44px",
                         display: "inline-flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        gap: "12px",
+                        gap: "8px",
                         borderRadius: "10px",
                         background: "#000",
                         color: "#fff",
-                        fontSize: "24px",
+                        fontSize: "18px",
                         fontWeight: 450,
                         lineHeight: 1,
                       }}

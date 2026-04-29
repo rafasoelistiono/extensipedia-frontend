@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { BASE_URL } from "@/lib/public-api";
 
 const TRACK_URL = `${BASE_URL}/api/v1/public/tickets/track/`;
+const TRACK_TIMEOUT_MS = 5_000;
 
 export async function GET(request: Request) {
   try {
@@ -15,6 +16,7 @@ export async function GET(request: Request) {
 
     const response = await fetch(upstreamUrl.toString(), {
       cache: "no-store",
+      signal: AbortSignal.timeout(TRACK_TIMEOUT_MS),
     });
 
     const raw = await response.text();

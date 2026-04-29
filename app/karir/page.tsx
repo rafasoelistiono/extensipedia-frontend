@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   title: "Career Center | Extensipedia",
 };
 
+export const revalidate = 600;
+
 const stats = [
   { value: "15+", label: "Professional Template" },
   { value: "8", label: "Platform Karir" },

@@ -20,6 +20,8 @@ import {
   getCompetencyTone,
 } from "@/lib/competency-ui";
 
+export const revalidate = 120;
+
 const featureItems: FeatureItem[] = [
   {
     icon: BookCopy,

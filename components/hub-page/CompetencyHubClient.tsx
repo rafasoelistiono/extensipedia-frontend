@@ -32,6 +32,17 @@ const ITEMS_PER_PAGE = 6;
 
 const monthFormatter = new Intl.DateTimeFormat("id-ID", { month: "long" });
 
+const localWinnerSlides = [
+  {
+    image_url: "/competency/winner-1.png",
+    alt_text: "Winner slide 1",
+  },
+  {
+    image_url: "/competency/winner-2.png",
+    alt_text: "Winner slide 2",
+  },
+] as const;
+
 function getYearOptions(items: CompetencyAgendaItem[]) {
   return Array.from(
     new Set(
@@ -139,27 +150,17 @@ export function CompetencyHubClient({
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
-  
-  const localWinnerSlides = [
-  {
-    image_url: "/competency/winner-1.png",
-    alt_text: "Winner slide 1",
-  },
-  {
-    image_url: "/competency/winner-2.png",
-    alt_text: "Winner slide 2",
-  },
-];
 
-const displayedWinnerSlides = localWinnerSlides;
+  const displayedWinnerSlides =
+    winnerSlides.length > 0 ? winnerSlides : localWinnerSlides;
 
-const safeWinnerSlide =
-  displayedWinnerSlides.length > 0
-    ? winnerSlide % displayedWinnerSlides.length
-    : 0;
+  const safeWinnerSlide =
+    displayedWinnerSlides.length > 0
+      ? winnerSlide % displayedWinnerSlides.length
+      : 0;
 
-const activeWinner = displayedWinnerSlides[safeWinnerSlide];
-const activeWinnerImageUrl = activeWinner?.image_url ?? "";
+  const activeWinner = displayedWinnerSlides[safeWinnerSlide];
+  const activeWinnerImageUrl = resolveMediaUrl(activeWinner?.image_url) ?? "";
 
   const chips = [
     {

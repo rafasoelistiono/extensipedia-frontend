@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import {
-  AppWindow,
   BookMarked,
   Compass,
   HandHeart,
   Handshake,
-  ScanSearch,
-  Smile,
   Target,
   Users,
 } from "lucide-react";
@@ -15,13 +12,15 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { ScrollReset } from "@/components/ScrollReset";
 import { OrganizationCarousel } from "@/components/about-page/OrganizationCarousel";
-import { ProgramCard } from "@/components/about-page/ProgramCard";
 import { SectionHeader } from "@/components/about-page/SectionHeader";
 import { getCabinetCalendar } from "@/lib/public-api";
+import { FeaturedProgramsTabs } from "@/components/about-page/FeaturedProgramsTabs";
 
 export const metadata: Metadata = {
   title: "Tentang Kami | Extensipedia",
 };
+
+export const revalidate = 600;
 
 const heroBackground = "/about/hero-bg.png";
 
@@ -68,7 +67,7 @@ const organizationMembers = [
     name: "Cameliah Hamdani",
     role: "Kepala Departemen",
     unit: "Pengembangan Karir",
-    image: "/about/Cameliah.png",
+    image: "/about/Cameliah.PNG",
     imageClassName: "h-[134px]",
   },
   {
@@ -160,31 +159,6 @@ const missionItems = [
     title: "Budaya Saling Mendukung",
     description: "Menumbuhkan budaya saling mendukung antar mahasiswa.",
     icon: HandHeart,
-  },
-];
-
-const programTabs = [
-  "Akademik & Teknologi",
-  "Akademik",
-  "Kompetensi & Karir",
-  "Advokasi",
-];
-
-const programs = [
-  {
-    title: "Extensipedia",
-    description: "Website pusat materi dan bank soal terpadu.",
-    icon: AppWindow,
-  },
-  {
-    title: "Study Boost & Exam Blastpedia",
-    description: "Tutorial menjelang ujian dan sistem peringatan jadwal.",
-    icon: ScanSearch,
-  },
-  {
-    title: "Fun Enlightenment",
-    description: 'Workshop AI Mastery dan strategi "SIAK War"',
-    icon: Smile,
   },
 ];
 
@@ -449,42 +423,20 @@ export default async function TentangKamiPage() {
           </div>
         </section>
 
-        <section className="bg-surface-muted py-[60px]">
-          <div className="mx-auto w-full max-w-[1213px] px-4 sm:px-6 lg:px-8">
-            <OrganizationCarousel members={organizationMembers} />
-          </div>
-        </section>
-
-        <section className="bg-base-white py-[60px]">
+        <section id="program-kerja-unggulan" className="bg-base-white py-[60px]">
           <div className="mx-auto w-full max-w-[1213px] px-4 sm:px-6 lg:px-8">
             <SectionHeader
               eyebrow="Program Kerja Unggulan"
               title="Hub Program Kerja Unggulan"
             />
 
-            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-4 sm:gap-x-10">
-              {programTabs.map((tab, index) => (
-                <div key={tab} className="flex flex-col gap-[5px]">
-                  <span
-                    className={[
-                      "font-tagline text-[18px] font-medium leading-none sm:text-[24px]",
-                      index === 0 ? "text-cta-muted" : "text-primary",
-                    ].join(" ")}
-                  >
-                    {tab}
-                  </span>
-                  {index === 0 ? (
-                    <span className="h-1 w-full rounded-[10px] bg-cta shadow-[0_4px_17px_rgba(252,194,2,0.5)]" />
-                  ) : null}
-                </div>
-              ))}
-            </div>
+            <FeaturedProgramsTabs />
+          </div>
+        </section>
 
-            <div className="mt-8 grid gap-5 sm:mt-10 sm:gap-[29px] lg:grid-cols-3">
-              {programs.map((program) => (
-                <ProgramCard key={program.title} {...program} />
-              ))}
-            </div>
+        <section className="bg-base-cream py-[60px]">
+          <div className="mx-auto w-full max-w-[1294px] px-4 sm:px-6 lg:px-8">
+            <OrganizationCarousel members={organizationMembers} />
           </div>
         </section>
 

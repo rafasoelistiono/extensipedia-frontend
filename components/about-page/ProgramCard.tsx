@@ -1,15 +1,20 @@
+import { ArrowRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 type ProgramCardProps = {
   icon: LucideIcon;
   title: string;
   description: string;
+  href?: string;
+  linkLabel?: string;
 };
 
 export function ProgramCard({
   icon: Icon,
   title,
   description,
+  href,
+  linkLabel = "Lihat detail",
 }: ProgramCardProps) {
   return (
     <article className="flex min-h-[230px] flex-col gap-[14px] rounded-[17px] border-2 border-primary bg-base-white px-7 py-[30px]">
@@ -25,6 +30,16 @@ export function ProgramCard({
           {description}
         </p>
       </div>
+
+      {href ? (
+        <a
+          href={href}
+          className="mt-auto inline-flex items-center gap-2 self-start rounded-full bg-cta px-4 py-2 font-tagline text-[15px] font-semibold leading-none text-primary transition hover:bg-cta/85"
+        >
+          {linkLabel}
+          <ArrowRight className="h-4 w-4" strokeWidth={2} />
+        </a>
+      ) : null}
     </article>
   );
 }

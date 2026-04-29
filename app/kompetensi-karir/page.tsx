@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   title: "Kompetensi & Karir Hub | Extensipedia",
 };
 
+export const revalidate = 120;
+
 export default async function KompetensiKarirPage() {
   let items: CompetencyAgendaItem[] = [];
   let winnerSlides: CompetencyWinnerSlide[] = [];

@@ -142,7 +142,7 @@ export function AspirationSubmitForm() {
             </span>
             <textarea
               name="short_description"
-              placeholder="Ceritakan inti aspirasi kamu secara jelas agar mudah ditindaklanjuti backend."
+              placeholder="Ceritakan inti aspirasi kamu."
               rows={5}
               className="input-base mt-2 w-full rounded-[10px] px-4 py-3 text-[14px] leading-6 outline-none"
               required

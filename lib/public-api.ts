@@ -4,7 +4,17 @@ const BASE_URL =
     "",
   );
 
-type RequestOptions = RequestInit;
+const DEFAULT_PUBLIC_REVALIDATE_SECONDS = 300;
+const DEFAULT_PUBLIC_TIMEOUT_MS = 650;
+const MUTATION_TIMEOUT_MS = 10_000;
+
+type RequestOptions = RequestInit & {
+  next?: {
+    revalidate?: number | false;
+    tags?: string[];
+  };
+  timeoutMs?: number;
+};
 
 export type ApiResponse<T> = {
   success: boolean;
@@ -132,9 +142,19 @@ export async function request<T>(
   options: RequestOptions = {},
   query?: Record<string, string | number | boolean | undefined | null>,
 ): Promise<T> {
+  const { timeoutMs, ...fetchOptions } = options;
+  const cacheMode = fetchOptions.cache ?? "force-cache";
+  const shouldUseNextCache = cacheMode !== "no-store";
+
   const response = await fetch(buildApiUrl(path, query), {
-    ...options,
-    cache: "no-store",
+    ...fetchOptions,
+    cache: cacheMode,
+    next: shouldUseNextCache
+      ? (fetchOptions.next ?? { revalidate: DEFAULT_PUBLIC_REVALIDATE_SECONDS })
+      : undefined,
+    signal:
+      fetchOptions.signal ??
+      AbortSignal.timeout(timeoutMs ?? DEFAULT_PUBLIC_TIMEOUT_MS),
   });
 
   if (!response.ok) {
@@ -147,6 +167,7 @@ export async function request<T>(
 export async function getAcademicYoutube() {
   return request<ApiResponse<AcademicYoutubeSection>>(
     "/api/v1/public/academic/youtube/",
+    { next: { revalidate: 600, tags: ["academic-youtube"] } },
   );
 }
 
@@ -158,7 +179,7 @@ export async function getAcademicCountdowns(query?: {
 }) {
   return request<ApiResponse<Paginated<AcademicCountdown>>>(
     "/api/v1/public/academic/countdown-events/",
-    {},
+    { next: { revalidate: 120, tags: ["academic-countdowns"] } },
     query,
   );
 }
@@ -171,7 +192,7 @@ export async function getAcademicQuickDownloads(query?: {
 }) {
   return request<ApiResponse<Paginated<AcademicQuickDownload>>>(
     "/api/v1/public/academic/quick-downloads/",
-    {},
+    { next: { revalidate: 300, tags: ["academic-downloads"] } },
     query,
   );
 }
@@ -182,7 +203,10 @@ export async function getAcademicRepository() {
       akuntansi: AcademicRepositoryMaterial[];
       manajemen: AcademicRepositoryMaterial[];
     }>
-  >("/api/v1/public/academic/repository/");
+  >(
+    "/api/v1/public/academic/repository/",
+    { next: { revalidate: 600, tags: ["academic-repository"] } },
+  );
 }
 
 export async function getCompetencyAgendas(query?: {
@@ -198,7 +222,7 @@ export async function getCompetencyAgendas(query?: {
 }) {
   return request<ApiResponse<Paginated<CompetencyAgendaItem>>>(
     "/api/v1/public/competency/agenda-cards/",
-    {},
+    { next: { revalidate: 120, tags: ["competency-agendas"] } },
     query,
   );
 }
@@ -210,7 +234,7 @@ export async function getCompetencyWinnerSlides(query?: {
 }) {
   return request<ApiResponse<Paginated<CompetencyWinnerSlide>>>(
     "/api/v1/public/competency/winner-slides/",
-    {},
+    { next: { revalidate: 600, tags: ["competency-winners"] } },
     query,
   );
 }
@@ -225,12 +249,16 @@ export async function getCabinetCalendar() {
       embed_code: string;
       provider: string;
     }>
-  >("/api/v1/public/about/cabinet-calendar/");
+  >(
+    "/api/v1/public/about/cabinet-calendar/",
+    { next: { revalidate: 600, tags: ["cabinet-calendar"] } },
+  );
 }
 
 export async function getCareerResources() {
   return request<ApiResponse<CareerResources>>(
     "/api/v1/public/career/resources/",
+    { next: { revalidate: 600, tags: ["career-resources"] } },
   );
 }
 
@@ -239,7 +267,7 @@ export async function getFeaturedAspirations(query?: {
 }) {
   const response = await request<ApiResponse<FeaturedAspiration[]>>(
     "/api/v1/public/aspirations/featured/",
-    {},
+    { next: { revalidate: 120, tags: ["featured-aspirations"] } },
     query,
   );
 
@@ -249,7 +277,7 @@ export async function getFeaturedAspirations(query?: {
 export async function trackTicket(ticketId?: string) {
   return request<ApiResponse<TicketTracking>>(
     "/api/v1/public/tickets/track/",
-    {},
+    { cache: "no-store", timeoutMs: MUTATION_TIMEOUT_MS },
     {
       ticket_id: ticketId,
     },

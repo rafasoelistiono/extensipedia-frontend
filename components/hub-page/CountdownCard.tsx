@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CalendarClock } from "lucide-react";
 import type { AcademicCountdown } from "@/lib/public-api";
 
 type CountdownCardProps = {
-  item: AcademicCountdown | null;
-  relatedItems: AcademicCountdown[];
+  items: AcademicCountdown[];
 };
 
 type CountdownParts = {
@@ -17,7 +16,7 @@ type CountdownParts = {
   target: Date | null;
 };
 
-function getCountdownParts(targetDateTime?: string): CountdownParts {
+function getCountdownParts(targetDateTime: string | undefined, now: Date): CountdownParts {
   if (!targetDateTime) {
     return {
       days: 0,
@@ -28,7 +27,6 @@ function getCountdownParts(targetDateTime?: string): CountdownParts {
     };
   }
 
-  const now = new Date();
   const target = new Date(targetDateTime);
   const diff = Math.max(0, target.getTime() - now.getTime());
 
@@ -41,13 +39,12 @@ function getCountdownParts(targetDateTime?: string): CountdownParts {
   return { days, hours, minutes, seconds, target };
 }
 
-function getCountdownProgress(targetDateTime?: string) {
+function getCountdownProgress(targetDateTime: string | undefined, now: Date) {
   if (!targetDateTime) {
     return 0;
   }
 
   const target = new Date(targetDateTime);
-  const now = new Date();
   const daysLeft = Math.max(
     0,
     Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
@@ -75,6 +72,7 @@ function formatTargetDate(value?: string) {
     day: "numeric",
     month: "long",
     year: "numeric",
+    timeZone: "Asia/Bangkok",
   });
 }
 
@@ -82,24 +80,83 @@ function padValue(value: number) {
   return String(value).padStart(2, "0");
 }
 
-export function CountdownCard({ item, relatedItems }: CountdownCardProps) {
-  const [countdown, setCountdown] = useState<CountdownParts>(() =>
-    getCountdownParts(item?.target_datetime),
-  );
+function getCountdownTimestamp(item: AcademicCountdown) {
+  const timestamp = new Date(item.target_datetime).getTime();
+
+  return Number.isNaN(timestamp) ? null : timestamp;
+}
+
+export function CountdownCard({ items }: CountdownCardProps) {
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
-    if (!item?.target_datetime) {
-      return;
-    }
+    const timeout = window.setTimeout(() => {
+      setNow(new Date());
+    }, 0);
 
     const interval = window.setInterval(() => {
-      setCountdown(getCountdownParts(item.target_datetime));
+      setNow(new Date());
     }, 1000);
 
-    return () => window.clearInterval(interval);
-  }, [item?.target_datetime]);
+    return () => {
+      window.clearTimeout(timeout);
+      window.clearInterval(interval);
+    };
+  }, []);
 
-  const progressWidth = getCountdownProgress(item?.target_datetime);
+  const sortedItems = useMemo(() => {
+    return items
+      .map((item) => ({
+        item,
+        timestamp: getCountdownTimestamp(item),
+      }))
+      .filter(
+        (entry): entry is { item: AcademicCountdown; timestamp: number } =>
+          entry.timestamp !== null,
+      )
+      .sort((left, right) => {
+        if (left.timestamp !== right.timestamp) {
+          return left.timestamp - right.timestamp;
+        }
+
+        return left.item.display_order - right.item.display_order;
+      })
+      .map((entry) => entry.item);
+  }, [items]);
+
+  const upcomingItems = useMemo(() => {
+    if (!now) {
+      return sortedItems;
+    }
+
+    return items
+      .map((item) => ({
+        item,
+        timestamp: getCountdownTimestamp(item),
+      }))
+      .filter(
+        (entry): entry is { item: AcademicCountdown; timestamp: number } =>
+          entry.timestamp !== null && entry.timestamp >= now.getTime(),
+      )
+      .sort((left, right) => {
+        if (left.timestamp !== right.timestamp) {
+          return left.timestamp - right.timestamp;
+        }
+
+        return left.item.display_order - right.item.display_order;
+      })
+      .map((entry) => entry.item);
+  }, [items, now, sortedItems]);
+
+  const activeItem = upcomingItems[0] ?? null;
+  const queueItems = upcomingItems.slice(1);
+  const countdown = now
+    ? getCountdownParts(activeItem?.target_datetime, now)
+    : getCountdownParts(undefined, new Date(0));
+  const progressWidth = now
+    ? getCountdownProgress(activeItem?.target_datetime, now)
+    : 0;
+
 
   return (
     <article className="rounded-[18px] bg-primary p-5 text-base-white shadow-[0_4px_17px_rgba(0,0,0,0.15)] sm:rounded-[20px] sm:p-7">
@@ -112,7 +169,7 @@ export function CountdownCard({ item, relatedItems }: CountdownCardProps) {
             Countdown
           </div>
           <div className="font-tagline text-[18px] text-base-white sm:text-[20px]">
-            {item?.title ?? "Event Akademik"}
+            {activeItem?.title ?? "Event Akademik"}
           </div>
         </div>
       </div>
@@ -149,21 +206,30 @@ export function CountdownCard({ item, relatedItems }: CountdownCardProps) {
 
       <div className="mt-5 border-t border-base-white/20 pt-4 font-tagline text-[14px] text-[#cbd5e1]/80 sm:mt-6 sm:pt-5 sm:text-[15px]">
         Target :{" "}
-        {item
-          ? `${item.title} - ${formatTargetDate(item.target_datetime)}`
+        {activeItem
+          ? `${activeItem.title} - ${formatTargetDate(activeItem.target_datetime)}`
           : "Belum tersedia"}
       </div>
 
-      {relatedItems.length > 0 ? (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {relatedItems.slice(0, 3).map((relatedItem) => (
-            <span
-              key={relatedItem.id}
-              className="rounded-full bg-base-white/10 px-3 py-1 text-[12px] text-[#e2e8f0]"
-            >
-              {relatedItem.title}
-            </span>
-          ))}
+      {queueItems.length > 0 ? (
+        <div className="mt-4">
+          <div className="mb-2 font-tagline text-[12px] uppercase tracking-[0.08em] text-[#cbd5e1]">
+            Queue Berikutnya
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {queueItems.map((queueItem) => (
+              <span
+                key={queueItem.id}
+                className="rounded-full bg-base-white/10 px-3 py-1 text-[12px] text-[#e2e8f0]"
+              >
+                {queueItem.title} - {formatTargetDate(queueItem.target_datetime)}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : !activeItem ? (
+        <div className="mt-4 rounded-[12px] bg-base-white/10 px-4 py-3 text-[13px] text-[#e2e8f0]">
+          Belum ada target countdown yang lebih besar dari waktu saat ini.
         </div>
       ) : null}
     </article>

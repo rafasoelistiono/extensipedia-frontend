@@ -135,6 +135,7 @@ export default async function Home() {
                   urgency={item.urgency_tag}
                   recommended={item.recommendation_tag}
                   registrationLink={item.registration_link}
+                  teamFindingLink={item.team_finding_link}
                   googleCalendarLink={item.google_calendar_link}
                   tone={getCompetencyTone(item)}
                 />

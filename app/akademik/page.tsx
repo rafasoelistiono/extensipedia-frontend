@@ -8,17 +8,21 @@ import {
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { ScrollReset } from "@/components/ScrollReset";
-import { CountdownCard } from "@/components/hub-page/CountdownCard";
-import { RepositoryCard } from "@/components/hub-page/RepositoryCard";
-import { HeroBanner } from "@/components/hub-page/HeroBanner";
 import { SectionHeader } from "@/components/about-page/SectionHeader";
+import { CountdownCard } from "@/components/hub-page/CountdownCard";
+import { HeroBanner } from "@/components/hub-page/HeroBanner";
+import { RepositoryCard } from "@/components/hub-page/RepositoryCard";
 import {
   getAcademicCountdowns,
+  getAcademicDigitalResources,
   getAcademicQuickDownloads,
   getAcademicRepository,
   getAcademicYoutube,
+  getFirstFilledString,
+  getFirstResolvedUrl,
   resolveMediaUrl,
   type AcademicCountdown,
+  type AcademicDigitalResources,
   type AcademicQuickDownload,
   type AcademicRepositoryMaterial,
   type AcademicYoutubeSection,
@@ -29,6 +33,18 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 120;
+
+type DigitalServiceCard = {
+  key: string;
+  title: string;
+  description: string;
+  href: string;
+  actionLabel: string;
+  borderColor: string;
+  iconBackground: string;
+  actionBackground: string;
+  icon: "canva" | "gemini";
+};
 
 function ArrowMark() {
   return (
@@ -97,10 +113,87 @@ function getDownloadLabel(item: AcademicQuickDownload) {
   return item.resource_type === "file" ? "File" : "Link";
 }
 
+function buildDigitalServiceCards(
+  resources: AcademicDigitalResources | null,
+): DigitalServiceCard[] {
+  if (!resources) {
+    return [];
+  }
+
+  const canvaHref = getFirstResolvedUrl(resources, [
+    "canva_pro",
+    "canva_pro_ekstensi",
+    "canva_pro_url",
+    "canva_link",
+    "canva_url",
+    "canva_access_url",
+    "canva_registration_url",
+  ]);
+  const geminiHref = getFirstResolvedUrl(resources, [
+    "gemini_advanced",
+    "gemini_advanced_url",
+    "gemini_link",
+    "gemini_url",
+    "gemini_access_url",
+    "gemini_registration_url",
+  ]);
+
+  return [
+    canvaHref
+      ? {
+          key: "canva",
+          title:
+            getFirstFilledString(resources, [
+              "canva_title",
+              "canva_pro_title",
+              "canva_pro_ekstensi_title",
+            ]) ??
+            "Canva Pro Ekstensi",
+          description:
+            getFirstFilledString(resources, [
+              "canva_description",
+              "canva_pro_description",
+              "canva_pro_ekstensi_description",
+            ]) ??
+            "Akses lisensi kolektif Canva Pro untuk kebutuhan presentasi dan desain tugas kuliah.",
+          href: canvaHref,
+          actionLabel: "Daftar Sekarang",
+          borderColor: "#833af0",
+          iconBackground: "#faf5ff",
+          actionBackground: "linear-gradient(90deg, #823cf8 0%, #9747ff 100%)",
+          icon: "canva",
+        }
+      : null,
+    geminiHref
+      ? {
+          key: "gemini",
+          title:
+            getFirstFilledString(resources, [
+              "gemini_title",
+              "gemini_advanced_title",
+            ]) ?? "Gemini Advanced",
+          description:
+            getFirstFilledString(resources, [
+              "gemini_description",
+              "gemini_advanced_description",
+            ]) ??
+            "Gabung slot family sharing untuk akses AI Gemini Advanced sebagai asisten riset dan belajar.",
+          href: geminiHref,
+          actionLabel: "Gabung Slot",
+          borderColor: "#5182ed",
+          iconBackground: "#eff6ff",
+          actionBackground: "#000",
+          icon: "gemini",
+        }
+      : null,
+  ].filter((item): item is DigitalServiceCard => item !== null);
+}
+
 export default async function AkademikPage() {
   let youtubeSection: AcademicYoutubeSection | null = null;
   let countdownItems: AcademicCountdown[] = [];
   let quickDownloads: AcademicQuickDownload[] = [];
+  let digitalResources: AcademicDigitalResources | null = null;
   let repository: {
     akuntansi: AcademicRepositoryMaterial[];
     manajemen: AcademicRepositoryMaterial[];
@@ -109,13 +202,19 @@ export default async function AkademikPage() {
     manajemen: [],
   };
 
-  const [youtubeResult, countdownResult, quickDownloadResult, repositoryResult] =
-    await Promise.allSettled([
-      getAcademicYoutube(),
-      getAcademicCountdowns({ page_size: 10, ordering: "display_order,target_datetime" }),
-      getAcademicQuickDownloads({ page_size: 10, ordering: "display_order,title" }),
-      getAcademicRepository(),
-    ]);
+  const [
+    youtubeResult,
+    countdownResult,
+    quickDownloadResult,
+    repositoryResult,
+    digitalResourcesResult,
+  ] = await Promise.allSettled([
+    getAcademicYoutube(),
+    getAcademicCountdowns({ page_size: 10, ordering: "display_order,target_datetime" }),
+    getAcademicQuickDownloads({ page_size: 10, ordering: "display_order,title" }),
+    getAcademicRepository(),
+    getAcademicDigitalResources(),
+  ]);
 
   if (youtubeResult.status === "fulfilled") {
     youtubeSection = youtubeResult.value.data;
@@ -137,8 +236,12 @@ export default async function AkademikPage() {
     repository = repositoryResult.value.data;
   }
 
-  const featuredCountdown = countdownItems[0] ?? null;
+  if (digitalResourcesResult.status === "fulfilled") {
+    digitalResources = digitalResourcesResult.value.data;
+  }
+
   const primaryDownload = quickDownloads[0] ?? null;
+  const digitalServiceCards = buildDigitalServiceCards(digitalResources);
 
   return (
     <div className="min-h-screen bg-base-white text-primary">
@@ -159,8 +262,7 @@ export default async function AkademikPage() {
         <section className="bg-base-white px-4 py-7 sm:px-6 sm:py-9 lg:px-8 lg:py-10">
           <div className="mx-auto grid max-w-[1246px] gap-4 sm:gap-5 xl:grid-cols-3 xl:gap-6">
             <CountdownCard
-              item={featuredCountdown}
-              relatedItems={countdownItems.slice(1)}
+              items={countdownItems}
             />
 
             <article className="rounded-[18px] bg-base-white p-5 shadow-[0_4px_17px_rgba(0,0,0,0.15)] sm:rounded-[20px] sm:p-7">
@@ -336,193 +438,119 @@ export default async function AkademikPage() {
               </p>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "24px",
-                marginTop: "32px",
-              }}
-            >
-              <article
-                className="bg-base-white"
+            {digitalServiceCards.length > 0 ? (
+              <div
                 style={{
-                  flex: "1 1 300px",
-                  minHeight: "170px",
-                  borderRadius: "16px",
-                  border: "3px solid #833af0",
-                  boxShadow: "0 4px 8.5px rgba(0,0,0,0.15)",
-                  padding: "20px",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "24px",
+                  marginTop: "32px",
                 }}
               >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                  <div
+                {digitalServiceCards.map((card) => (
+                  <article
+                    key={card.key}
+                    className="bg-base-white"
                     style={{
-                      width: "56px",
-                      height: "56px",
+                      flex: "1 1 300px",
+                      minHeight: "170px",
                       borderRadius: "16px",
-                      backgroundColor: "#faf5ff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
+                      border: `3px solid ${card.borderColor}`,
+                      boxShadow: "0 4px 8.5px rgba(0,0,0,0.15)",
+                      padding: "20px",
                     }}
                   >
-                    <PaletteMark />
-                  </div>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                      <div
+                        style={{
+                          width: "56px",
+                          height: "56px",
+                          borderRadius: "16px",
+                          backgroundColor: card.iconBackground,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {card.icon === "canva" ? <PaletteMark /> : <SparkleMark />}
+                      </div>
 
-                  <div
-                    style={{
-                      flex: 1,
-                      minWidth: 0,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: "10px",
-                    }}
-                  >
-                    <h3
-                      className="font-tagline"
-                      style={{
-                        width: "100%",
-                        maxWidth: "289px",
-                        color: "#000",
-                        fontSize: "22px",
-                        fontWeight: 450,
-                        lineHeight: 1,
-                      }}
-                    >
-                      Canva Pro Ekstensi
-                    </h3>
-                    <p
-                      className="font-body"
-                      style={{
-                        maxWidth: "423px",
-                        color: "#616161",
-                        fontSize: "15px",
-                        lineHeight: 1.3,
-                      }}
-                    >
-                      Akses lisensi kolektif Canva Pro untuk kebutuhan
-                      presentasi dan desain tugas kuliah.
-                    </p>
+                      <div
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "flex-start",
+                          gap: "10px",
+                        }}
+                      >
+                        <h3
+                          className="font-tagline"
+                          style={{
+                            width: "100%",
+                            maxWidth: "289px",
+                            color: "#000",
+                            fontSize: "22px",
+                            fontWeight: 450,
+                            lineHeight: 1,
+                          }}
+                        >
+                          {card.title}
+                        </h3>
+                        <p
+                          className="font-body"
+                          style={{
+                            maxWidth: "423px",
+                            color: "#616161",
+                            fontSize: "15px",
+                            lineHeight: 1.3,
+                          }}
+                        >
+                          {card.description}
+                        </p>
 
-                    <a
-                      href="#"
-                      className="font-tagline"
-                      style={{
-                        marginTop: "auto",
-                        width: "min(240px, 100%)",
-                        height: "44px",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        borderRadius: "10px",
-                        background:
-                          "linear-gradient(90deg, #823cf8 0%, #9747ff 100%)",
-                        color: "#fff",
-                        fontSize: "18px",
-                        fontWeight: 450,
-                        lineHeight: 1,
-                      }}
-                    >
-                      Daftar Sekarang
-                      <ArrowMark />
-                    </a>
-                  </div>
-                </div>
-              </article>
-
-              <article
-                className="bg-base-white"
-                style={{
-                  flex: "1 1 300px",
-                  minHeight: "170px",
-                  borderRadius: "16px",
-                  border: "3px solid #5182ed",
-                  boxShadow: "0 4px 8.5px rgba(0,0,0,0.15)",
-                  padding: "20px",
-                }}
-              >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                  <div
-                    style={{
-                      width: "56px",
-                      height: "56px",
-                      borderRadius: "16px",
-                      backgroundColor: "#eff6ff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <SparkleMark />
-                  </div>
-
-                  <div
-                    style={{
-                      flex: 1,
-                      minWidth: 0,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: "10px",
-                    }}
-                  >
-                    <h3
-                      className="font-tagline"
-                      style={{
-                        width: "100%",
-                        maxWidth: "289px",
-                        color: "#000",
-                        fontSize: "22px",
-                        fontWeight: 450,
-                        lineHeight: 1,
-                      }}
-                    >
-                      Gemini Advanced
-                    </h3>
-                    <p
-                      className="font-body"
-                      style={{
-                        maxWidth: "423px",
-                        color: "#616161",
-                        fontSize: "15px",
-                        lineHeight: 1.3,
-                      }}
-                    >
-                      Gabung slot family sharing untuk akses AI Gemini
-                      Advanced sebagai asisten riset dan belajar.
-                    </p>
-
-                    <a
-                      href="#"
-                      className="font-tagline"
-                      style={{
-                        marginTop: "auto",
-                        width: "min(240px, 100%)",
-                        height: "44px",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        borderRadius: "10px",
-                        background: "#000",
-                        color: "#fff",
-                        fontSize: "18px",
-                        fontWeight: 450,
-                        lineHeight: 1,
-                      }}
-                    >
-                      Gabung Slot
-                      <ArrowMark />
-                    </a>
-                  </div>
-                </div>
-              </article>
-            </div>
+                        <a
+                          href={card.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-tagline"
+                          style={{
+                            marginTop: "auto",
+                            width: "min(240px, 100%)",
+                            height: "44px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
+                            borderRadius: "10px",
+                            background: card.actionBackground,
+                            color: "#fff",
+                            fontSize: "18px",
+                            fontWeight: 450,
+                            lineHeight: 1,
+                          }}
+                        >
+                          {card.actionLabel}
+                          <ArrowMark />
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-8 rounded-[20px] border border-dashed border-panel-border bg-surface-subtle px-6 py-12 text-center">
+                <p className="font-headline text-[28px] text-primary">
+                  Layanan digital belum aktif.
+                </p>
+                <p className="mx-auto mt-3 max-w-[620px] text-[15px] leading-7 text-copy-soft">
+                  Card Canva Pro dan Gemini tidak ditampilkan karena backend belum
+                  mengirim link aktif pada singleton `academic/digital-resources`.
+                </p>
+              </div>
+            )}
           </div>
         </section>
 

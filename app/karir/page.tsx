@@ -15,20 +15,21 @@ import {
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { ScrollReset } from "@/components/ScrollReset";
+import { CareerCard } from "@/components/hub-page/CareerCard";
 import { HeroBanner } from "@/components/hub-page/HeroBanner";
-import { getCareerResources, resolveMediaUrl, type CareerResources } from "@/lib/public-api";
+import {
+  getCareerOpportunities,
+  getCareerResources,
+  resolveMediaUrl,
+  type CareerOpportunity,
+  type CareerResources,
+} from "@/lib/public-api";
 
 export const metadata: Metadata = {
   title: "Career Center | Extensipedia",
 };
 
 export const revalidate = 600;
-
-const stats = [
-  { value: "15+", label: "Professional Template" },
-  { value: "8", label: "Platform Karir" },
-  { value: "500+", label: "Template" },
-];
 
 const getawayGroups = [
   {
@@ -116,7 +117,7 @@ function buildResourceCards(resourceLinks: CareerResources | null): ResourceCard
       title: "CV Templates",
       description:
         "Master template CV yang telah lulus sistem screening otomatis Big 4, Tech Giants, dan FMCG.",
-      meta: "6 template tersedia · DOC & PDF",
+      meta: "6 template tersedia - DOC & PDF",
       badge: "ATS",
       badgeTone: "success",
       icon: FileText,
@@ -126,7 +127,7 @@ function buildResourceCards(resourceLinks: CareerResources | null): ResourceCard
       title: "Cover Letter",
       description:
         "Template cover letter profesional dengan struktur yang terbukti meningkatkan response rate hingga 3x lipat.",
-      meta: "4 template tersedia · DOC & PDF",
+      meta: "4 template tersedia - DOC & PDF",
       badge: "ATS",
       badgeTone: "info",
       icon: BadgeCheck,
@@ -136,7 +137,7 @@ function buildResourceCards(resourceLinks: CareerResources | null): ResourceCard
       title: "Portfolio Guide",
       description:
         "Panduan menyusun portfolio berbasis hasil untuk jalur manajerial dan spesialis.",
-      meta: "2 framework tersedia · PDF",
+      meta: "2 framework tersedia - PDF",
       badge: "Guide",
       badgeTone: "lavender",
       icon: NotebookText,
@@ -146,27 +147,74 @@ function buildResourceCards(resourceLinks: CareerResources | null): ResourceCard
       title: "Salary Script",
       description:
         "Skrip negosiasi gaji dan kompensasi yang efektif untuk fresh graduate dan career switcher.",
-      meta: "3 skenario tersedia · PDF",
+      meta: "3 skenario tersedia - PDF",
       badge: "Hot",
       badgeTone: "warning",
       icon: CircleDollarSign,
       href: resolveMediaUrl(resourceLinks?.salary_script),
     },
-  ];
+  ].filter((item) => item.href);
+}
+
+function getOpportunityType(item: CareerOpportunity): "Internship" | "Career Event" | "Career Center" {
+  const content = `${item.title} ${item.organization} ${item.description}`.toLowerCase();
+
+  if (content.includes("event") || content.includes("webinar") || content.includes("workshop")) {
+    return "Career Event";
+  }
+
+  if (content.includes("career center") || content.includes("bootcamp")) {
+    return "Career Center";
+  }
+
+  return "Internship";
+}
+
+function formatOpportunityDeadline(value: string | null) {
+  if (!value) {
+    return "Segera";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Segera";
+  }
+
+  return date.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export default async function KarirPage() {
   let resourceLinks: CareerResources | null = null;
+  let opportunities: CareerOpportunity[] = [];
 
-  try {
-    const response = await getCareerResources();
-    resourceLinks = response.data;
-  } catch {
-    resourceLinks = null;
+  const [resourceResult, opportunityResult] = await Promise.allSettled([
+    getCareerResources(),
+    getCareerOpportunities({
+      page_size: 6,
+      ordering: "closes_at,created_at",
+    }),
+  ]);
+
+  if (resourceResult.status === "fulfilled") {
+    resourceLinks = resourceResult.value.data;
+  }
+
+  if (opportunityResult.status === "fulfilled") {
+    opportunities = opportunityResult.value.data.items;
   }
 
   const resources = buildResourceCards(resourceLinks);
   const caseStudyHref = resolveMediaUrl(resourceLinks?.case_study_interview_prep);
+  const stats = [
+    { value: String(resources.length), label: "Resource Aktif" },
+    { value: String(getawayGroups.flatMap((group) => group.items).length), label: "Platform Karir" },
+    { value: String(opportunities.length), label: "Opportunity Aktif" },
+  ];
 
   return (
     <div className="min-h-screen bg-base-white text-primary">
@@ -220,61 +268,66 @@ export default async function KarirPage() {
               </p>
             </div>
 
-            <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {resources.map((resource) => {
-                const Icon = resource.icon;
-                const isAvailable = Boolean(resource.href);
+            {resources.length > 0 ? (
+              <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                {resources.map((resource) => {
+                  const Icon = resource.icon;
 
-                return (
-                  <article
-                    key={resource.title}
-                    className="flex h-full flex-col rounded-[20px] border border-[#e5edf3] bg-base-white p-5 shadow-[0_6px_20px_rgba(3,57,93,0.08)]"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-surface-muted text-primary">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <span
-                        className={[
-                          "inline-flex rounded-full px-2.5 py-1 font-tagline text-[11px] font-bold uppercase tracking-[0.08em]",
-                          resourceBadgeClassMap[resource.badgeTone],
-                        ].join(" ")}
-                      >
-                        {resource.badge}
-                      </span>
-                    </div>
-
-                    <div className="mt-5">
-                      <h3 className="font-tagline text-[18px] font-bold text-primary">
-                        {resource.title}
-                      </h3>
-                      <p className="mt-3 font-body text-[14px] leading-7 text-copy-muted">
-                        {resource.description}
-                      </p>
-                      <p className="mt-3 font-body text-[12px] font-semibold text-copy-soft">
-                        {resource.meta}
-                      </p>
-                    </div>
-
-                    <a
-                      href={resource.href ?? "#"}
-                      target={isAvailable ? "_blank" : undefined}
-                      rel={isAvailable ? "noreferrer" : undefined}
-                      aria-disabled={!isAvailable}
-                      className={[
-                        "mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-[10px] px-4 font-tagline text-[14px] font-semibold [&_svg]:!text-white",
-                        isAvailable
-                          ? "bg-primary !text-white transition hover:brightness-110"
-                          : "cursor-not-allowed bg-[#cbd5e1] !text-white",
-                      ].join(" ")}
+                  return (
+                    <article
+                      key={resource.title}
+                      className="flex h-full flex-col rounded-[20px] border border-[#e5edf3] bg-base-white p-5 shadow-[0_6px_20px_rgba(3,57,93,0.08)]"
                     >
-                      <Download className="h-4 w-4" />
-                      {isAvailable ? "Buka Resource" : "Belum Tersedia"}
-                    </a>
-                  </article>
-                );
-              })}
-            </div>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-surface-muted text-primary">
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <span
+                          className={[
+                            "inline-flex rounded-full px-2.5 py-1 font-tagline text-[11px] font-bold uppercase tracking-[0.08em]",
+                            resourceBadgeClassMap[resource.badgeTone],
+                          ].join(" ")}
+                        >
+                          {resource.badge}
+                        </span>
+                      </div>
+
+                      <div className="mt-5">
+                        <h3 className="font-tagline text-[18px] font-bold text-primary">
+                          {resource.title}
+                        </h3>
+                        <p className="mt-3 font-body text-[14px] leading-7 text-copy-muted">
+                          {resource.description}
+                        </p>
+                        <p className="mt-3 font-body text-[12px] font-semibold text-copy-soft">
+                          {resource.meta}
+                        </p>
+                      </div>
+
+                      <a
+                        href={resource.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-primary px-4 font-tagline text-[14px] font-semibold !text-white transition hover:brightness-110 [&_svg]:!text-white"
+                      >
+                        <Download className="h-4 w-4" />
+                        Buka Resource
+                      </a>
+                    </article>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="mt-8 rounded-[20px] border border-dashed border-panel-border bg-surface-subtle px-6 py-12 text-center">
+                <p className="font-headline text-[28px] text-primary">
+                  Resource karir belum tersedia.
+                </p>
+                <p className="mx-auto mt-3 max-w-[620px] text-[15px] leading-7 text-copy-soft">
+                  Backend belum mengirimkan link resource aktif untuk CV, cover letter,
+                  portfolio, atau salary script.
+                </p>
+              </div>
+            )}
 
             <div className="mt-8 rounded-[20px] border border-[#d0e1ec] bg-[#e8f4fd] px-5 py-5 sm:px-7">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -310,6 +363,46 @@ export default async function KarirPage() {
                 </a>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="bg-base-cream px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14">
+          <div className="mx-auto max-w-[1280px]">
+            <div>
+              <h2 className="section-title text-[34px] leading-none sm:text-[42px] lg:text-[48px]">
+                Career Opportunities
+              </h2>
+              <p className="mt-3 max-w-[780px] font-body text-[15px] leading-7 text-copy-muted sm:text-[18px]">
+                Lowongan dan peluang aktif langsung dari endpoint `career/opportunities`.
+              </p>
+            </div>
+
+            {opportunities.length > 0 ? (
+              <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {opportunities.map((item) => (
+                  <CareerCard
+                    key={item.id}
+                    type={getOpportunityType(item)}
+                    title={item.title}
+                    organizer={item.organization}
+                    description={item.description}
+                    deadline={formatOpportunityDeadline(item.closes_at)}
+                    ctaLabel="Lihat Peluang"
+                    href={item.apply_url}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-8 rounded-[20px] border border-dashed border-panel-border bg-base-white px-6 py-12 text-center">
+                <p className="font-headline text-[28px] text-primary">
+                  Belum ada opportunity aktif.
+                </p>
+                <p className="mx-auto mt-3 max-w-[620px] text-[15px] leading-7 text-copy-soft">
+                  Endpoint peluang karir belum mengirim data published yang bisa
+                  ditampilkan di frontend.
+                </p>
+              </div>
+            )}
           </div>
         </section>
 

@@ -1,8 +1,15 @@
-const BASE_URL =
-  (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://203.194.113.185").replace(
-    /\/$/,
-    "",
-  );
+const DEFAULT_API_ORIGIN = "http://127.0.0.1:8000";
+
+function normalizeApiOrigin(value: string) {
+  return value
+    .trim()
+    .replace(/\/api\/v1\/?$/i, "")
+    .replace(/\/$/, "");
+}
+
+const BASE_URL = normalizeApiOrigin(
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_ORIGIN,
+);
 
 const DEFAULT_PUBLIC_REVALIDATE_SECONDS = 300;
 const DEFAULT_PUBLIC_TIMEOUT_MS = 650;
@@ -41,6 +48,15 @@ export type AcademicCountdown = {
   display_order: number;
 };
 
+export type AcademicService = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  thumbnail: string | null;
+  published_at: string | null;
+};
+
 export type AcademicQuickDownload = {
   id: string;
   title: string;
@@ -63,6 +79,8 @@ export type AcademicYoutubeSection = {
   embed_url: string;
 };
 
+export type AcademicDigitalResources = Record<string, unknown>;
+
 export type CompetencyAgendaItem = {
   id: string;
   title: string;
@@ -74,6 +92,7 @@ export type CompetencyAgendaItem = {
   pricing_tag: string;
   deadline_date: string;
   registration_link: string;
+  team_finding_link: string;
   google_calendar_link: string;
   countdown_days: number;
 };
@@ -94,6 +113,17 @@ export type CareerResources = {
   salary_script: string;
   case_study_interview_prep: string;
 };
+
+export type CareerOpportunity = {
+  id: string;
+  title: string;
+  organization: string;
+  description: string;
+  apply_url: string | null;
+  closes_at: string | null;
+};
+
+export type AdvocacyPolicyResources = Record<string, unknown>;
 
 export type FeaturedAspiration = {
   id: string;
@@ -164,6 +194,45 @@ export async function request<T>(
   return response.json() as Promise<T>;
 }
 
+export function getFirstFilledString(
+  source: Record<string, unknown> | null | undefined,
+  keys: string[],
+) {
+  if (!source) {
+    return null;
+  }
+
+  for (const key of keys) {
+    const value = source[key];
+
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return null;
+}
+
+export function getFirstResolvedUrl(
+  source: Record<string, unknown> | null | undefined,
+  keys: string[],
+) {
+  return resolveMediaUrl(getFirstFilledString(source, keys));
+}
+
+export async function getAcademicServices(query?: {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  ordering?: string;
+}) {
+  return request<ApiResponse<Paginated<AcademicService>>>(
+    "/api/v1/public/academic/services/",
+    { next: { revalidate: 300, tags: ["academic-services"] } },
+    query,
+  );
+}
+
 export async function getAcademicYoutube() {
   return request<ApiResponse<AcademicYoutubeSection>>(
     "/api/v1/public/academic/youtube/",
@@ -206,6 +275,13 @@ export async function getAcademicRepository() {
   >(
     "/api/v1/public/academic/repository/",
     { next: { revalidate: 600, tags: ["academic-repository"] } },
+  );
+}
+
+export async function getAcademicDigitalResources() {
+  return request<ApiResponse<AcademicDigitalResources>>(
+    "/api/v1/public/academic/digital-resources/",
+    { next: { revalidate: 600, tags: ["academic-digital-resources"] } },
   );
 }
 
@@ -259,6 +335,26 @@ export async function getCareerResources() {
   return request<ApiResponse<CareerResources>>(
     "/api/v1/public/career/resources/",
     { next: { revalidate: 600, tags: ["career-resources"] } },
+  );
+}
+
+export async function getCareerOpportunities(query?: {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  ordering?: string;
+}) {
+  return request<ApiResponse<Paginated<CareerOpportunity>>>(
+    "/api/v1/public/career/opportunities/",
+    { next: { revalidate: 300, tags: ["career-opportunities"] } },
+    query,
+  );
+}
+
+export async function getAdvocacyPolicyResources() {
+  return request<ApiResponse<AdvocacyPolicyResources>>(
+    "/api/v1/public/advocacy/policy-resources/",
+    { next: { revalidate: 600, tags: ["advocacy-policy-resources"] } },
   );
 }
 

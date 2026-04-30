@@ -50,32 +50,22 @@ export async function POST(request: Request) {
     }
 
     if (!response.ok) {
-      const message =
-        typeof parsed === "object" &&
-        parsed !== null &&
-        "message" in parsed &&
-        typeof (parsed as { message?: unknown }).message === "string"
-          ? (parsed as { message: string }).message
-          : "Gagal mengirim aspirasi ke server.";
-
-      return NextResponse.json({ message }, { status: response.status });
+      return NextResponse.json(
+        parsed ?? { success: false, message: "Gagal mengirim aspirasi ke server." },
+        { status: response.status },
+      );
     }
 
-    const upstreamMessage =
-      typeof parsed === "object" &&
-      parsed !== null &&
-      "message" in parsed &&
-      typeof (parsed as { message?: unknown }).message === "string"
-        ? (parsed as { message: string }).message
-        : "Aspiration submitted successfully";
-
-    return NextResponse.json({
-      message: `${upstreamMessage} Aspirasi sudah masuk ke backend, silakan cek email untuk notifikasi lanjutan.`,
-      data: parsed,
-    });
+    return NextResponse.json(
+      parsed ?? {
+        success: true,
+        message: "Aspiration submitted successfully",
+        data: null,
+      },
+    );
   } catch {
     return NextResponse.json(
-      { message: "Terjadi kendala saat menghubungi server aspirasi." },
+      { success: false, message: "Terjadi kendala saat menghubungi server aspirasi." },
       { status: 500 },
     );
   }

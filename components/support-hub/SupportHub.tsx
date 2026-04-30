@@ -2,22 +2,31 @@ import Link from "next/link";
 import {
   ArrowRight,
   BadgeAlert,
-  BriefcaseBusiness,
-  FileSpreadsheet,
   Megaphone,
   MessageCircleMore,
   ShieldCheck,
   Ticket,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { BreadcrumbTrail } from "@/components/BreadcrumbTrail";
 import { AspirationSubmitForm } from "@/components/support-hub/AspirationSubmitForm";
 import { FeaturedAspirationsSection } from "@/components/support-hub/FeaturedAspirationsSection";
 import { TicketTracker } from "@/components/support-hub/TicketTracker";
 import type { FeaturedAspiration } from "@/lib/public-api";
 
+export type PolicyResourceCard = {
+  title: string;
+  description: string;
+  href: string;
+  topTone: string;
+  iconTone: string;
+  icon: LucideIcon;
+};
+
 type SupportHubProps = {
   activeTab: "aspirasi" | "lacak";
   aspirations: FeaturedAspiration[];
+  policyResources: PolicyResourceCard[];
 };
 
 const supportHighlights = [
@@ -38,33 +47,6 @@ const supportHighlights = [
     description: "Dari Submitted hingga Resolved secara transparan",
     icon: BadgeAlert,
     iconTone: "bg-[#f0fdf4] text-[#15803d]",
-  },
-] as const;
-
-const policyResources = [
-  {
-    title: "Siak WAR",
-    description:
-      "Strategi dan tips jitu untuk memenangkan perang pengambilan mata kuliah di SIAK NG.",
-    topTone: "bg-primary",
-    iconTone: "bg-[#4451b4] text-base-white",
-    icon: FileSpreadsheet,
-  },
-  {
-    title: "Cicilan UKT",
-    description:
-      "Prosedur lengkap pengajuan cicilan UKT, syarat dokumen, dan timeline pengajuan.",
-    topTone: "bg-[#0a5a8a]",
-    iconTone: "bg-base-white text-cta",
-    icon: BriefcaseBusiness,
-  },
-  {
-    title: "Alur SKPI",
-    description:
-      "Panduan lengkap pengajuan Surat Keterangan Pendamping Ijazah (SKPI) dan persyaratannya.",
-    topTone: "bg-primary",
-    iconTone: "bg-base-white text-primary",
-    icon: BadgeAlert,
   },
 ] as const;
 
@@ -160,10 +142,11 @@ function SupportContactCard() {
 function PolicyCard({
   title,
   description,
+  href,
   topTone,
   iconTone,
   icon: Icon,
-}: (typeof policyResources)[number]) {
+}: PolicyResourceCard) {
   return (
     <article className="overflow-hidden rounded-[20px] border border-base-grey bg-base-white shadow-[0_4px_17px_rgba(0,0,0,0.08)]">
       <div className={["relative h-[72px]", topTone].join(" ")}>
@@ -181,7 +164,9 @@ function PolicyCard({
         <h3 className="font-headline text-[22px] leading-none text-primary">{title}</h3>
         <p className="mt-3 text-[14px] leading-6 text-copy-soft">{description}</p>
         <a
-          href="#"
+          href={href}
+          target="_blank"
+          rel="noreferrer"
           className="mt-5 inline-flex items-center gap-2 font-tagline text-[15px] font-semibold text-primary transition hover:text-cta"
         >
           Baca Panduan
@@ -192,7 +177,11 @@ function PolicyCard({
   );
 }
 
-export function SupportHub({ activeTab, aspirations }: SupportHubProps) {
+export function SupportHub({
+  activeTab,
+  aspirations,
+  policyResources,
+}: SupportHubProps) {
   const isTicketTab = activeTab === "lacak";
 
   return (
@@ -269,11 +258,23 @@ export function SupportHub({ activeTab, aspirations }: SupportHubProps) {
             Panduan singkat kebijakan akademik yang wajib kamu tahu
           </p>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-3 lg:gap-5">
-            {policyResources.map((resource) => (
-              <PolicyCard key={resource.title} {...resource} />
-            ))}
-          </div>
+          {policyResources.length > 0 ? (
+            <div className="mt-8 grid gap-4 lg:grid-cols-3 lg:gap-5">
+              {policyResources.map((resource) => (
+                <PolicyCard key={resource.title} {...resource} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-8 rounded-[20px] border border-dashed border-panel-border bg-surface-subtle px-6 py-12 text-center">
+              <p className="font-headline text-[28px] text-primary">
+                Panduan kebijakan belum tersedia.
+              </p>
+              <p className="mx-auto mt-3 max-w-[620px] text-[15px] leading-7 text-copy-soft">
+                Card literasi kebijakan disembunyikan otomatis ketika singleton
+                `advocacy/policy-resources` belum memiliki link aktif.
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </main>

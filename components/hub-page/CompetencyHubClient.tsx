@@ -32,17 +32,6 @@ const ITEMS_PER_PAGE = 6;
 
 const monthFormatter = new Intl.DateTimeFormat("id-ID", { month: "long" });
 
-const localWinnerSlides = [
-  {
-    image_url: "/competency/winner-1.png",
-    alt_text: "Winner slide 1",
-  },
-  {
-    image_url: "/competency/winner-2.png",
-    alt_text: "Winner slide 2",
-  },
-] as const;
-
 function getYearOptions(items: CompetencyAgendaItem[]) {
   return Array.from(
     new Set(
@@ -151,9 +140,7 @@ export function CompetencyHubClient({
     currentPage * ITEMS_PER_PAGE,
   );
 
-  const displayedWinnerSlides =
-    winnerSlides.length > 0 ? winnerSlides : localWinnerSlides;
-
+  const displayedWinnerSlides = winnerSlides;
   const safeWinnerSlide =
     displayedWinnerSlides.length > 0
       ? winnerSlide % displayedWinnerSlides.length
@@ -416,6 +403,7 @@ export function CompetencyHubClient({
                     urgency={item.urgency_tag}
                     recommended={item.recommendation_tag}
                     registrationLink={item.registration_link}
+                    teamFindingLink={item.team_finding_link}
                     googleCalendarLink={item.google_calendar_link}
                     tone={getCompetencyTone(item)}
                   />

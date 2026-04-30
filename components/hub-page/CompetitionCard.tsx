@@ -1,4 +1,13 @@
-import { CalendarDays, CalendarPlus2, CircleAlert, ExternalLink, Globe, Laptop, Trophy } from "lucide-react";
+import {
+  CalendarDays,
+  CalendarPlus2,
+  CircleAlert,
+  ExternalLink,
+  Globe,
+  Laptop,
+  Trophy,
+  Users,
+} from "lucide-react";
 
 type CompetitionCardProps = {
   title: string;
@@ -11,6 +20,7 @@ type CompetitionCardProps = {
   urgency?: boolean;
   recommended?: boolean;
   registrationLink?: string | null;
+  teamFindingLink?: string | null;
   googleCalendarLink?: string | null;
   tone?: "primary" | "sky" | "green";
 };
@@ -36,11 +46,14 @@ export function CompetitionCard({
   urgency = false,
   recommended = false,
   registrationLink,
+  teamFindingLink,
   googleCalendarLink,
   tone = "primary",
 }: CompetitionCardProps) {
   const isWorkshop = normalizeTag(category) === "workshop";
+  const isCompetition = normalizeTag(category) === "lomba";
   const hasRegistrationLink = Boolean(registrationLink);
+  const hasTeamFindingLink = Boolean(teamFindingLink?.trim()) && isCompetition;
   const hasCalendarLink = Boolean(googleCalendarLink);
 
   return (
@@ -124,6 +137,17 @@ export function CompetitionCard({
           >
             Daftar Sekarang
           </a>
+          {hasTeamFindingLink ? (
+            <a
+              href={teamFindingLink ?? "#"}
+              target="_blank"
+              rel="noreferrer"
+              className="flex h-10 items-center justify-center gap-2 rounded-[10px] bg-[#eef4fb] px-4 font-tagline text-[14px] font-semibold whitespace-nowrap text-primary sm:text-[15px]"
+            >
+              <Users className="h-4 w-4" />
+              Cari Tim
+            </a>
+          ) : null}
           <a
             href={googleCalendarLink ?? "#"}
             target={hasCalendarLink ? "_blank" : undefined}

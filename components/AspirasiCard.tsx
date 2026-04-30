@@ -33,11 +33,6 @@ type ActionResponse = {
   };
 };
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://203.194.113.185").replace(
-  /\/$/,
-  "",
-);
-
 function formatStatus(status?: string) {
   if (!status) {
     return null;
@@ -109,12 +104,9 @@ export function AspirasiCard({
     setActionError("");
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/public/aspirations/${id}/${action}/`,
-        {
-          method: "POST",
-        },
-      );
+      const response = await fetch(`/api/aspirations/${id}/${action}`, {
+        method: "POST",
+      });
       const payload = (await response.json()) as ActionResponse;
 
       if (!response.ok || !payload.success) {

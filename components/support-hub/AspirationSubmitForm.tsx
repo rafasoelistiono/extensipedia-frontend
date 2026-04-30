@@ -5,15 +5,13 @@ import { LoaderCircle, Megaphone, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 type SubmitResponse = {
+  success?: boolean;
   message?: string;
   data?: {
-    message?: string;
-    data?: {
-      ticket_id?: string;
-      title?: string;
-      status?: string;
-      submitted_at?: string;
-    };
+    ticket_id?: string;
+    title?: string;
+    status?: string;
+    submitted_at?: string;
   };
 };
 
@@ -31,6 +29,7 @@ export function AspirationSubmitForm() {
   const [ticketId, setTicketId] = useState<string | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [fileError, setFileError] = useState("");
 
   useEffect(() => {
     if (status !== "submitting") {
@@ -46,6 +45,15 @@ export function AspirationSubmitForm() {
   }, [status]);
 
   async function handleSubmit(formData: FormData) {
+    const attachment = formData.get("evidence_attachment");
+
+    if (attachment instanceof File && attachment.size > 5 * 1024 * 1024) {
+      setStatus("error");
+      setTicketId(null);
+      setMessage("Ukuran file bukti maksimum 5 MB.");
+      return;
+    }
+
     setStatus("submitting");
     setMessage("Sedang membuat ticket, mengirim data ke backend, dan menunggu konfirmasi email.");
     setTicketId(null);
@@ -63,7 +71,7 @@ export function AspirationSubmitForm() {
       }
 
       setStatus("success");
-      setTicketId(result.data?.data?.ticket_id ?? null);
+      setTicketId(result.data?.ticket_id ?? null);
       setMessage(
         result.message ||
           "Aspirasi berhasil dikirim ke backend. Notifikasi lanjutan akan dikirim melalui email.",
@@ -172,12 +180,32 @@ export function AspirationSubmitForm() {
               <input
                 type="file"
                 name="evidence_attachment"
+                accept="image/*,application/pdf"
                 className="hidden"
-                onChange={(event) =>
-                  setSelectedFileName(event.target.files?.[0]?.name ?? null)
-                }
+                onChange={(event) => {
+                  const nextFile = event.target.files?.[0] ?? null;
+
+                  setSelectedFileName(nextFile?.name ?? null);
+
+                  if (!nextFile) {
+                    setFileError("");
+                    return;
+                  }
+
+                  if (nextFile.size > 5 * 1024 * 1024) {
+                    setFileError("Ukuran file maksimum 5 MB.");
+                    event.target.value = "";
+                    setSelectedFileName(null);
+                    return;
+                  }
+
+                  setFileError("");
+                }}
               />
             </label>
+            {fileError ? (
+              <p className="mt-2 text-[13px] text-[#be123c]">{fileError}</p>
+            ) : null}
           </div>
 
           {status === "submitting" ? (

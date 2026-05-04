@@ -108,11 +108,15 @@ type ResourceCardConfig = {
   badge: string;
   badgeTone: keyof typeof resourceBadgeClassMap;
   icon: typeof FileText;
+  href: string;
+};
+
+type ResourceCardDraft = Omit<ResourceCardConfig, "href"> & {
   href: string | null;
 };
 
 function buildResourceCards(resourceLinks: CareerResources | null): ResourceCardConfig[] {
-  return [
+  const cards: ResourceCardDraft[] = [
     {
       title: "CV Templates",
       description:
@@ -153,7 +157,9 @@ function buildResourceCards(resourceLinks: CareerResources | null): ResourceCard
       icon: CircleDollarSign,
       href: resolveMediaUrl(resourceLinks?.salary_script),
     },
-  ].filter((item) => item.href);
+  ];
+
+  return cards.filter((item): item is ResourceCardConfig => item.href !== null);
 }
 
 function getOpportunityType(item: CareerOpportunity): "Internship" | "Career Event" | "Career Center" {
@@ -210,9 +216,13 @@ export default async function KarirPage() {
 
   const resources = buildResourceCards(resourceLinks);
   const caseStudyHref = resolveMediaUrl(resourceLinks?.case_study_interview_prep);
+  const platformCount = getawayGroups.reduce(
+    (total, group) => total + group.items.length,
+    0,
+  );
   const stats = [
     { value: String(resources.length), label: "Resource Aktif" },
-    { value: String(getawayGroups.flatMap((group) => group.items).length), label: "Platform Karir" },
+    { value: String(platformCount), label: "Platform Karir" },
     { value: String(opportunities.length), label: "Opportunity Aktif" },
   ];
 

@@ -28,7 +28,7 @@ export default async function KompetensiKarirPage() {
         ordering: "-created_at,-updated_at,deadline_date,title",
       }),
       getCompetencyWinnerSlides({
-        page_size: 10,
+        page_size: 6,
         ordering: "display_order,updated_at",
       }),
     ]);

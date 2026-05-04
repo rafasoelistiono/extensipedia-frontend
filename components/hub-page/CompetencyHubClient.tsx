@@ -29,8 +29,34 @@ type CompetencyHubClientProps = {
 };
 
 const ITEMS_PER_PAGE = 6;
+const WINNER_SLIDE_SLOT_COUNT = 6;
+
+type WinnerSlideSlot = {
+  slot: number;
+  slide: CompetencyWinnerSlide | null;
+};
 
 const monthFormatter = new Intl.DateTimeFormat("id-ID", { month: "long" });
+
+function getWinnerSlideSlots(slides: CompetencyWinnerSlide[]): WinnerSlideSlot[] {
+  const slots = Array.from({ length: WINNER_SLIDE_SLOT_COUNT }, (_, index) => ({
+    slot: index + 1,
+    slide: null as CompetencyWinnerSlide | null,
+  }));
+
+  slides.forEach((slide) => {
+    const slotIndex = slide.display_order - 1;
+
+    if (slotIndex >= 0 && slotIndex < WINNER_SLIDE_SLOT_COUNT) {
+      slots[slotIndex] = {
+        slot: slide.display_order,
+        slide,
+      };
+    }
+  });
+
+  return slots;
+}
 
 function getYearOptions(items: CompetencyAgendaItem[]) {
   return Array.from(
@@ -140,13 +166,14 @@ export function CompetencyHubClient({
     currentPage * ITEMS_PER_PAGE,
   );
 
-  const displayedWinnerSlides = winnerSlides;
-  const safeWinnerSlide =
-    displayedWinnerSlides.length > 0
-      ? winnerSlide % displayedWinnerSlides.length
-      : 0;
+  const displayedWinnerSlides = useMemo(
+    () => getWinnerSlideSlots(winnerSlides),
+    [winnerSlides],
+  );
+  const safeWinnerSlide = winnerSlide % displayedWinnerSlides.length;
 
-  const activeWinner = displayedWinnerSlides[safeWinnerSlide];
+  const activeWinnerSlot = displayedWinnerSlides[safeWinnerSlide];
+  const activeWinner = activeWinnerSlot.slide;
   const activeWinnerImageUrl = resolveMediaUrl(activeWinner?.image_url) ?? "";
 
   const chips = [
@@ -476,40 +503,58 @@ export function CompetencyHubClient({
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-surface-subtle px-6 text-center">
                   <p className="max-w-[360px] font-tagline text-[14px] text-copy-soft sm:text-[15px]">
-                    Winner slide belum tersedia.
+                    Winner slide slot {activeWinnerSlot.slot} belum tersedia.
                   </p>
                 </div>
               )}
 
-              {displayedWinnerSlides.length > 1 ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setWinnerSlide((current) =>
-                        current === 0 ? displayedWinnerSlides.length - 1 : current - 1,
-                      )
-                    }
-                    aria-label="Lihat foto pemenang sebelumnya"
-                    className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-base-white/90 text-primary shadow-md transition hover:scale-105"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setWinnerSlide((current) =>
+                    current === 0 ? displayedWinnerSlides.length - 1 : current - 1,
+                  )
+                }
+                aria-label="Lihat slot pemenang sebelumnya"
+                className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-base-white/90 text-primary shadow-md transition hover:scale-105"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setWinnerSlide((current) =>
-                        current === displayedWinnerSlides.length - 1 ? 0 : current + 1,
-                      )
-                    }
-                    aria-label="Lihat foto pemenang berikutnya"
-                    className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-base-white/90 text-primary shadow-md transition hover:scale-105"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                </>
-              ) : null}
+              <button
+                type="button"
+                onClick={() =>
+                  setWinnerSlide((current) =>
+                    current === displayedWinnerSlides.length - 1 ? 0 : current + 1,
+                  )
+                }
+                aria-label="Lihat slot pemenang berikutnya"
+                className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-base-white/90 text-primary shadow-md transition hover:scale-105"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-2">
+              {displayedWinnerSlides.map((slot, index) => (
+                <button
+                  key={slot.slot}
+                  type="button"
+                  onClick={() => setWinnerSlide(index)}
+                  aria-label={`Lihat winner slide slot ${slot.slot}`}
+                  aria-current={index === safeWinnerSlide ? "true" : undefined}
+                  className={[
+                    "flex h-8 min-w-8 items-center justify-center rounded-full border px-2 font-tagline text-[12px] font-semibold transition",
+                    index === safeWinnerSlide
+                      ? "border-primary bg-primary text-base-white"
+                      : slot.slide
+                        ? "border-primary bg-base-white text-primary"
+                        : "border-[#9fb8c9] bg-base-white/65 text-copy-soft",
+                  ].join(" ")}
+                >
+                  {slot.slot}
+                </button>
+              ))}
             </div>
 
             <div className="flex flex-col gap-4 rounded-[18px] border border-primary bg-[#dbe9f5] px-4 py-4 sm:px-5 lg:flex-row lg:items-center lg:justify-between lg:rounded-[20px] lg:px-5">

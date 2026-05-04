@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { LoaderCircle, Megaphone, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
@@ -20,6 +21,30 @@ const submittingSteps = [
   "Meminta backend membuat ticket ID.",
   "Menunggu respons akhir atau pesan error dari server.",
 ] as const;
+
+function SubmitAspirationButton({ isSubmitting }: { isSubmitting: boolean }) {
+  const { pending } = useFormStatus();
+  const showLoading = pending || isSubmitting;
+
+  return (
+    <Button
+      type="submit"
+      variant="secondary"
+      className="h-11 w-full justify-center rounded-[10px] text-[14px] disabled:cursor-wait disabled:opacity-70"
+      disabled={showLoading}
+      ariaBusy={showLoading}
+    >
+      {showLoading ? (
+        <>
+          <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+          <span>Menunggu respon server...</span>
+        </>
+      ) : (
+        "Kirim Aspirasi"
+      )}
+    </Button>
+  );
+}
 
 export function AspirationSubmitForm() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">(
@@ -45,6 +70,10 @@ export function AspirationSubmitForm() {
   }, [status]);
 
   async function handleSubmit(formData: FormData) {
+    if (status === "submitting") {
+      return;
+    }
+
     const attachment = formData.get("evidence_attachment");
 
     if (attachment instanceof File && attachment.size > 5 * 1024 * 1024) {
@@ -246,14 +275,7 @@ export function AspirationSubmitForm() {
             </div>
           ) : null}
 
-          <Button
-            type="submit"
-            variant="secondary"
-            className="h-11 w-full justify-center rounded-[10px] text-[14px] disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={status === "submitting"}
-          >
-            {status === "submitting" ? "Mengirim Aspirasi..." : "Kirim Aspirasi"}
-          </Button>
+          <SubmitAspirationButton isSubmitting={status === "submitting"} />
         </fieldset>
 
         {status === "submitting" ? (

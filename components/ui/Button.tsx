@@ -8,6 +8,7 @@ type ButtonProps = {
   className?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
+  ariaBusy?: boolean;
 };
 
 export function Button({
@@ -18,6 +19,7 @@ export function Button({
   className = "",
   onClick,
   disabled = false,
+  ariaBusy,
 }: ButtonProps) {
   const classes = [
     "btn-base",
@@ -45,6 +47,7 @@ export function Button({
       className={classes}
       onClick={onClick}
       disabled={disabled}
+      aria-busy={ariaBusy}
     >
       {children}
     </button>

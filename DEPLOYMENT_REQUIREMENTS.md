@@ -1,193 +1,313 @@
 # Frontend Deployment Requirements
 
-## Tujuan
+## Tujuan deployment
 
-Frontend publik berjalan di path `/` pada VPS yang sama dengan backend, sedangkan backend admin berjalan di `/admin`.
+Frontend publik berjalan di path `/` pada VPS yang sama dengan backend. Backend tetap melayani admin, public API, static admin, dan media backend.
 
-Arsitektur target:
-- `https://<ip-atau-domain>/` -> Next.js frontend publik
-- `https://<ip-atau-domain>/admin/` -> backend admin
+Target routing:
+- `https://<domain-atau-ip>/` -> Next.js frontend publik
+- `https://<domain-atau-ip>/admin/` -> backend admin
+- `https://<domain-atau-ip>/api/v1/` -> backend public API
+- `https://<domain-atau-ip>/static/` -> backend static files
+- `https://<domain-atau-ip>/media/` -> backend uploaded media
 
-## Temuan dari frontend saat ini
+Prinsip utama: browser harus melihat frontend dan backend sebagai origin yang sama agar tidak perlu konfigurasi CORS untuk public flow.
 
-### Route publik frontend
+## Stack frontend saat ini
 
-Route publik yang ada di frontend:
+Project ini memakai:
+- Next.js `16.1.6`
+- React `19.2.3`
+- Node.js minimal `20.9.0`, mengikuti `engines` dari package Next lokal
+- Package manager: npm, karena repo memiliki `package-lock.json`
+
+Script yang dipakai saat deployment:
+
+```bash
+npm ci
+npm run build
+npm run start
+```
+
+Runtime Next default memakai port `3000`. Jalankan service di loopback, misalnya `127.0.0.1:3000`, lalu expose hanya lewat reverse proxy.
+
+## Route publik frontend
+
+Route halaman publik yang harus diarahkan ke Next:
 - `/`
 - `/akademik`
 - `/kompetensi-karir`
 - `/karir`
 - `/advokasi`
 - `/tentang-kami`
+- `/sitemap.xml`
+- semua asset Next di `/_next/`
+- semua file statis di root public, misalnya `/logo-extensipedia.png`, `/hero-campus.jpg`, `/favicon.ico`
 
-Sumber: [page.tsx](/c:/projek/extensipedia-frontend/app/page.tsx), [page.tsx](/c:/projek/extensipedia-frontend/app/akademik/page.tsx), [page.tsx](/c:/projek/extensipedia-frontend/app/kompetensi-karir/page.tsx), [page.tsx](/c:/projek/extensipedia-frontend/app/karir/page.tsx), [page.tsx](/c:/projek/extensipedia-frontend/app/advokasi/page.tsx), [page.tsx](/c:/projek/extensipedia-frontend/app/tentang-kami/page.tsx)
+Sumber route utama:
+- [app/page.tsx](/c:/projek/extensipedia-frontend/app/page.tsx)
+- [app/akademik/page.tsx](/c:/projek/extensipedia-frontend/app/akademik/page.tsx)
+- [app/kompetensi-karir/page.tsx](/c:/projek/extensipedia-frontend/app/kompetensi-karir/page.tsx)
+- [app/karir/page.tsx](/c:/projek/extensipedia-frontend/app/karir/page.tsx)
+- [app/advokasi/page.tsx](/c:/projek/extensipedia-frontend/app/advokasi/page.tsx)
+- [app/tentang-kami/page.tsx](/c:/projek/extensipedia-frontend/app/tentang-kami/page.tsx)
+- [app/sitemap.ts](/c:/projek/extensipedia-frontend/app/sitemap.ts)
 
-### Route API internal milik Next
+## Route API internal milik Next
 
-Frontend ini memiliki route internal Next yang tidak boleh diarahkan ke backend:
+Frontend memiliki route API Next sendiri. Route ini harus tetap diarahkan ke service Next, bukan ke backend langsung:
 - `/api/aspirations/submit`
 - `/api/aspirations/track`
+- `/api/aspirations/{id}/upvote`
+- `/api/aspirations/{id}/vote`
 
-Sumber: [route.ts](/c:/projek/extensipedia-frontend/app/api/aspirations/submit/route.ts), [route.ts](/c:/projek/extensipedia-frontend/app/api/aspirations/track/route.ts)
+Route tersebut bertugas menjadi proxy terkontrol dari browser ke backend public API:
+- `/api/aspirations/submit` -> backend `/api/v1/public/aspirations/submit/`
+- `/api/aspirations/track` -> backend `/api/v1/public/tickets/track/`
+- `/api/aspirations/{id}/upvote` -> backend `/api/v1/public/aspirations/{id}/upvote/`
+- `/api/aspirations/{id}/vote` -> backend `/api/v1/public/aspirations/{id}/vote/`
 
-Implikasi:
-- Jangan buat reverse proxy `location /api/` langsung ke backend.
-- Yang harus ke backend hanya prefix API backend, misalnya `/api/v1/`.
+Sumber:
+- [app/api/aspirations/submit/route.ts](/c:/projek/extensipedia-frontend/app/api/aspirations/submit/route.ts)
+- [app/api/aspirations/track/route.ts](/c:/projek/extensipedia-frontend/app/api/aspirations/track/route.ts)
+- [app/api/aspirations/[id]/[action]/route.ts](/c:/projek/extensipedia-frontend/app/api/aspirations/[id]/[action]/route.ts)
 
-### Dependensi frontend ke backend
+Implikasi penting:
+- Jangan buat reverse proxy generik `location /api/` ke backend.
+- Yang boleh diarahkan ke backend adalah prefix backend yang spesifik, yaitu `/api/v1/`.
+- Prefix `/api/aspirations/` harus diarahkan ke Next.
 
-Frontend mengakses backend melalui `NEXT_PUBLIC_API_BASE_URL`.
+## Dependensi frontend ke backend
 
-Sumber: [public-api.ts](/c:/projek/extensipedia-frontend/lib/public-api.ts#L1), [AspirasiCard.tsx](/c:/projek/extensipedia-frontend/components/AspirasiCard.tsx#L36)
+Frontend membaca backend origin dari `NEXT_PUBLIC_API_BASE_URL`.
 
-Implikasi:
-- Nilai `NEXT_PUBLIC_API_BASE_URL` harus berupa origin yang sama dengan frontend, misalnya `https://<ip-atau-domain>`.
-- Jangan isi dengan suffix `/api/v1`.
-- Jangan arahkan ke port internal backend jika ingin menghindari CORS.
+Sumber:
+- [lib/public-api.ts](/c:/projek/extensipedia-frontend/lib/public-api.ts)
+- [components/AspirasiCard.tsx](/c:/projek/extensipedia-frontend/components/AspirasiCard.tsx)
+- [components/support-hub/AspirationSubmitForm.tsx](/c:/projek/extensipedia-frontend/components/support-hub/AspirationSubmitForm.tsx)
+- [components/support-hub/TicketTracker.tsx](/c:/projek/extensipedia-frontend/components/support-hub/TicketTracker.tsx)
 
-### Client-side call langsung ke backend
+Nilai production yang direkomendasikan:
 
-Komponen aspirasi melakukan POST langsung dari browser ke:
-- `/api/v1/public/aspirations/{id}/upvote/`
-- `/api/v1/public/aspirations/{id}/vote/`
+```env
+NEXT_PUBLIC_SITE_URL=https://<domain-atau-ip>
+NEXT_PUBLIC_API_BASE_URL=https://<domain-atau-ip>
+```
 
-Sumber: [AspirasiCard.tsx](/c:/projek/extensipedia-frontend/components/AspirasiCard.tsx#L112)
+Aturan env:
+- `NEXT_PUBLIC_SITE_URL` dipakai untuk URL sitemap.
+- `NEXT_PUBLIC_API_BASE_URL` harus berupa origin saja.
+- Jangan tambahkan suffix `/api/v1`; kode sudah menambahkan path API sendiri.
+- Jangan isi `NEXT_PUBLIC_API_BASE_URL` dengan `http://127.0.0.1:8000` untuk production, karena value ini juga bisa dipakai untuk URL media/link yang terlihat dari browser.
+- Jika production memakai HTTPS, kedua value harus memakai `https://`.
 
-Implikasi:
-- Reverse proxy harus mengarahkan `/api/v1/` ke backend.
-- Agar aman tanpa CORS, origin frontend dan backend harus sama.
+Catatan: `.env.example` boleh tetap memakai alamat development lokal, tetapi environment production di server harus memakai origin publik.
 
-## Requirement VPS dan routing
+## Endpoint backend yang dibutuhkan frontend
 
-### Reverse proxy
+Backend minimal harus menyediakan endpoint berikut:
+- `GET /api/v1/public/academic/services/`
+- `GET /api/v1/public/academic/youtube/`
+- `GET /api/v1/public/academic/countdown-events/`
+- `GET /api/v1/public/academic/quick-downloads/`
+- `GET /api/v1/public/academic/repository/`
+- `GET /api/v1/public/academic/digital-resources/`
+- `GET /api/v1/public/competency/agenda-cards/`
+- `GET /api/v1/public/competency/winner-slides/`
+- `GET /api/v1/public/about/cabinet-calendar/`
+- `GET /api/v1/public/career/resources/`
+- `GET /api/v1/public/career/opportunities/`
+- `GET /api/v1/public/advocacy/policy-resources/`
+- `GET /api/v1/public/aspirations/featured/`
+- `POST /api/v1/public/aspirations/submit/`
+- `POST /api/v1/public/aspirations/{id}/upvote/`
+- `POST /api/v1/public/aspirations/{id}/vote/`
+- `GET /api/v1/public/tickets/track/`
+
+## Requirement reverse proxy
 
 Wajib ada reverse proxy di depan Next dan backend, misalnya Nginx.
 
-Routing minimum yang dibutuhkan:
+Contoh pembagian service internal:
+- frontend Next.js: `127.0.0.1:3000`
+- backend app: `127.0.0.1:8000`
+- Nginx: port publik `80` dan `443`
+
+Routing minimum:
 - `/admin/` -> backend
 - `/api/v1/` -> backend
 - `/media/` -> backend
 - `/static/` -> backend
+- `/api/aspirations/` -> frontend
 - `/_next/` -> frontend
-- `/api/aspirations/submit` -> frontend
-- `/api/aspirations/track` -> frontend
 - selain path di atas -> frontend
 
-Catatan penting:
-- `/static/` dibutuhkan untuk asset Django admin atau backend admin setara.
-- `/media/` dibutuhkan untuk file upload dan image dari backend.
-- Jika `/static/` atau `/media/` diarahkan ke frontend, admin dan asset backend akan rusak.
-
-### Port internal
-
-Contoh pembagian service:
-- frontend Next.js: `127.0.0.1:3000`
-- backend app: `127.0.0.1:8000`
-- Nginx: `80/443`
-
-## Requirement environment frontend
-
-Frontend minimal butuh env berikut:
-
-```env
-NEXT_PUBLIC_SITE_URL=https://<ip-atau-domain>
-NEXT_PUBLIC_API_BASE_URL=https://<ip-atau-domain>
-```
-
-Keterangan:
-- `NEXT_PUBLIC_SITE_URL` dipakai untuk sitemap.
-- `NEXT_PUBLIC_API_BASE_URL` dipakai untuk request data publik dan resolve media URL.
-- Keduanya sebaiknya memakai origin yang sama.
-
-## Requirement environment backend
-
-Backend minimal harus memenuhi:
-- `ALLOWED_HOSTS` mencakup IP/domain VPS
-- `CSRF_TRUSTED_ORIGINS` mencakup origin publik jika admin pakai HTTPS
-- `STATIC_URL` konsisten, misalnya `/static/`
-- `MEDIA_URL` konsisten, misalnya `/media/`
-- backend admin tersedia di `/admin/`
-- seluruh public API frontend tersedia di `/api/v1/public/...`
-
-Jika backend saat ini masih serve root `/`, backend harus diubah agar root publik tidak bentrok dengan frontend.
-
-## Requirement build dan runtime frontend
-
-Node.js harus mengikuti versi yang kompatibel dengan Next `16.1.6`.
-
-Kebutuhan runtime:
-- install dependency dengan `npm ci`
-- build dengan `npm run build`
-- serve dengan `npm run start`
-- process manager direkomendasikan: `pm2`, `systemd`, atau container
-
-## Requirement deployment SEO/public
-
-Karena frontend sudah punya sitemap di [sitemap.ts](/c:/projek/extensipedia-frontend/app/sitemap.ts), origin publik harus benar.
-
-Jika `NEXT_PUBLIC_SITE_URL` masih `localhost`, maka `/sitemap.xml` akan salah.
-
-## Risiko yang perlu diperhatikan
-
-### Risiko 1: Salah proxy `/api`
-
-Jika semua `/api/` diarahkan ke backend:
-- route Next `/api/aspirations/submit` dan `/api/aspirations/track` akan gagal
-- form aspirasi dan pelacakan tiket di frontend akan rusak
-
-### Risiko 2: `NEXT_PUBLIC_API_BASE_URL` diarahkan ke port backend
-
-Jika diisi `http://127.0.0.1:8000` atau host berbeda:
-- browser client-side tidak bisa mengaksesnya
-- atau akan butuh konfigurasi CORS tambahan
-
-### Risiko 3: `/static/` tidak diarahkan ke backend
-
-Jika `/static/` tidak diproxy ke backend:
-- halaman admin bisa tampil tanpa CSS/JS
-
-### Risiko 4: `/media/` tidak diarahkan ke backend
-
-Jika `/media/` tidak tersedia:
-- gambar winner slide, lampiran, dan asset media backend tidak tampil
-
-## Rekomendasi implementasi
-
-Rekomendasi final untuk skenario ini:
-- pakai satu reverse proxy Nginx
-- frontend di `/`
-- backend admin di `/admin/`
-- backend API di `/api/v1/`
-- backend media di `/media/`
-- backend static di `/static/`
-- set `NEXT_PUBLIC_SITE_URL` dan `NEXT_PUBLIC_API_BASE_URL` ke origin publik yang sama
+Catatan:
+- `/static/` dibutuhkan untuk CSS/JS Django admin atau backend admin setara.
+- `/media/` dibutuhkan untuk image dan file upload dari backend.
+- Jika `/static/` atau `/media/` diarahkan ke frontend, halaman admin atau media publik akan rusak.
 
 ## Contoh mapping Nginx
 
-Ini contoh kebutuhan mapping, bukan file final:
+Ini contoh kebutuhan mapping, bukan file final lengkap:
 
 ```nginx
-location /admin/ {
-    proxy_pass http://127.0.0.1:8000;
-}
+server {
+    listen 80;
+    server_name <domain-atau-ip>;
 
-location /api/v1/ {
-    proxy_pass http://127.0.0.1:8000;
-}
+    client_max_body_size 20m;
 
-location /media/ {
-    proxy_pass http://127.0.0.1:8000;
-}
+    location ^~ /admin/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
 
-location /static/ {
-    proxy_pass http://127.0.0.1:8000;
-}
+    location ^~ /api/v1/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
 
-location /_next/ {
-    proxy_pass http://127.0.0.1:3000;
-}
+    location ^~ /media/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
 
-location / {
-    proxy_pass http://127.0.0.1:3000;
+    location ^~ /static/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ^~ /api/aspirations/ {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ^~ /_next/ {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
 }
+```
+
+Untuk HTTPS, pasang TLS di Nginx dan pastikan `X-Forwarded-Proto` bernilai `https` pada request publik HTTPS.
+
+## Requirement backend
+
+Backend minimal harus memenuhi:
+- `ALLOWED_HOSTS` mencakup domain/IP publik.
+- `CSRF_TRUSTED_ORIGINS` mencakup origin publik, misalnya `https://<domain-atau-ip>`.
+- `STATIC_URL` konsisten dengan `/static/`.
+- `MEDIA_URL` konsisten dengan `/media/`.
+- Admin tersedia di `/admin/`.
+- Public API tersedia di `/api/v1/public/...`.
+- Backend tidak mengambil alih root `/`, karena root publik sudah milik frontend.
+- Jika backend berjalan di belakang Nginx HTTPS, aktifkan setting proxy SSL yang sesuai, misalnya `SECURE_PROXY_SSL_HEADER` pada Django.
+
+## Requirement process manager
+
+Frontend perlu dijalankan sebagai service yang restart otomatis. Pilihan yang disarankan:
+- `systemd`
+- `pm2`
+- container
+
+Contoh command runtime:
+
+```bash
+npm run start -- -H 127.0.0.1 -p 3000
+```
+
+Pastikan environment production tersedia saat build dan saat runtime. Env `NEXT_PUBLIC_*` dibaca saat build untuk bundle client dan juga tersedia saat server runtime.
+
+## Checklist verifikasi setelah deploy
+
+Jalankan pengecekan berikut dari browser atau `curl`:
+- `/` tampil sebagai landing frontend.
+- `/akademik`, `/kompetensi-karir`, `/karir`, `/advokasi`, dan `/tentang-kami` tampil tanpa error.
+- `/_next/static/...` tidak 404.
+- `/sitemap.xml` memakai domain production, bukan localhost.
+- `/admin/` membuka backend admin dengan CSS/JS utuh.
+- `/api/v1/public/aspirations/featured/` dijawab backend.
+- `/api/aspirations/track?ticket_id=<ticket>` dijawab Next API route, bukan 404 dari backend.
+- File dari `/media/` bisa dibuka jika backend mengembalikan URL media.
+
+## Risiko yang harus dihindari
+
+### Risiko 1: `location /api/` diarahkan ke backend
+
+Dampak:
+- `/api/aspirations/submit` gagal.
+- `/api/aspirations/track` gagal.
+- vote/upvote aspirasi dari card gagal.
+
+Solusi:
+- Arahkan hanya `/api/v1/` ke backend.
+- Arahkan `/api/aspirations/` ke Next.
+
+### Risiko 2: `NEXT_PUBLIC_API_BASE_URL` memakai port internal backend
+
+Dampak:
+- URL media atau link resource bisa menjadi `http://127.0.0.1:8000/...` di browser pengguna.
+- Browser pengguna tidak bisa mengakses host internal server.
+
+Solusi:
+- Untuk production, gunakan origin publik yang sama dengan frontend.
+
+### Risiko 3: `/static/` tidak diarahkan ke backend
+
+Dampak:
+- Backend admin tampil tanpa CSS/JS.
+
+Solusi:
+- Proxy `/static/` ke backend atau serve static backend langsung dari Nginx sesuai konfigurasi backend.
+
+### Risiko 4: `/media/` tidak tersedia
+
+Dampak:
+- Gambar winner slide, lampiran, dan resource file dari backend tidak tampil.
+
+Solusi:
+- Proxy `/media/` ke backend atau serve media langsung dari Nginx sesuai storage backend.
+
+## Rekomendasi final
+
+Gunakan satu origin publik dengan Nginx sebagai reverse proxy:
+- Next.js di `/`
+- Backend admin di `/admin/`
+- Backend API di `/api/v1/`
+- Backend static di `/static/`
+- Backend media di `/media/`
+- Next API internal di `/api/aspirations/`
+
+Set production env:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://<domain-atau-ip>
+NEXT_PUBLIC_API_BASE_URL=https://<domain-atau-ip>
 ```

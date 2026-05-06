@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -15,13 +16,10 @@ import {
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { ScrollReset } from "@/components/ScrollReset";
-import { CareerCard } from "@/components/hub-page/CareerCard";
 import { HeroBanner } from "@/components/hub-page/HeroBanner";
 import {
-  getCareerOpportunities,
   getCareerResources,
   resolveMediaUrl,
-  type CareerOpportunity,
   type CareerResources,
 } from "@/lib/public-api";
 
@@ -39,13 +37,13 @@ const getawayGroups = [
       {
         name: "CDC UI",
         description: "Pusat Karir Resmi UI",
-        accent: "bg-[#fef3c7] text-[#b45309]",
+        logoSrc: "/career/CDC%20UI%20LOGO.png",
         href: "https://cdc.ui.ac.id/",
       },
       {
         name: "Karirhub Kemnaker",
         description: "Portal Resmi Kementerian",
-        accent: "bg-[#dbeafe] text-[#1d4ed8]",
+        logoSrc: "/career/KARIRHUB%20LOGO.png",
         href: "https://karirhub.kemnaker.go.id/",
       },
     ],
@@ -55,15 +53,15 @@ const getawayGroups = [
     tone: "ocean",
     items: [
       {
-        name: "Jobstreet ID",
+        name: "JobStreet Indonesia",
         description: "Industri Tradisional",
-        accent: "bg-[#dbeafe] text-[#1e3a8a]",
-        href: "https://www.jobstreet.co.id/",
+        logoSrc: "/career/JOBSTREET%20LOGO.jpg",
+        href: "https://id.jobstreet.com/",
       },
       {
-        name: "Glints",
+        name: "Glints Indonesia",
         description: "Kreatif & Startup",
-        accent: "bg-[#f3f4f6] text-[#111827]",
+        logoSrc: "/career/GLINTS%20LOGO.jpg",
         href: "https://glints.com/id",
       },
     ],
@@ -73,16 +71,16 @@ const getawayGroups = [
     tone: "mint",
     items: [
       {
-        name: "Upwork",
-        description: "Proyek Spesialis Global",
-        accent: "bg-[#14a800] text-white",
-        href: "https://www.upwork.com/",
-      },
-      {
         name: "Fiverr",
         description: "Proyek Singkat",
-        accent: "bg-[#1dbf73] text-white",
+        logoSrc: "/career/FIVERR%20LOGO.png",
         href: "https://www.fiverr.com/",
+      },
+      {
+        name: "Upwork",
+        description: "Proyek Spesialis Global",
+        logoSrc: "/career/UPWORK%20LOGO.png",
+        href: "https://www.upwork.com/",
       },
     ],
   },
@@ -162,56 +160,14 @@ function buildResourceCards(resourceLinks: CareerResources | null): ResourceCard
   return cards.filter((item): item is ResourceCardConfig => item.href !== null);
 }
 
-function getOpportunityType(item: CareerOpportunity): "Internship" | "Career Event" | "Career Center" {
-  const content = `${item.title} ${item.organization} ${item.description}`.toLowerCase();
-
-  if (content.includes("event") || content.includes("webinar") || content.includes("workshop")) {
-    return "Career Event";
-  }
-
-  if (content.includes("career center") || content.includes("bootcamp")) {
-    return "Career Center";
-  }
-
-  return "Internship";
-}
-
-function formatOpportunityDeadline(value: string | null) {
-  if (!value) {
-    return "Segera";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "Segera";
-  }
-
-  return date.toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
 export default async function KarirPage() {
   let resourceLinks: CareerResources | null = null;
-  let opportunities: CareerOpportunity[] = [];
 
-  const [resourceResult, opportunityResult] = await Promise.allSettled([
-    getCareerResources(),
-    getCareerOpportunities({
-      page_size: 6,
-      ordering: "closes_at,created_at",
-    }),
-  ]);
-
-  if (resourceResult.status === "fulfilled") {
-    resourceLinks = resourceResult.value.data;
-  }
-
-  if (opportunityResult.status === "fulfilled") {
-    opportunities = opportunityResult.value.data.items;
+  try {
+    const resourceResult = await getCareerResources();
+    resourceLinks = resourceResult.data;
+  } catch {
+    resourceLinks = null;
   }
 
   const resources = buildResourceCards(resourceLinks);
@@ -223,7 +179,6 @@ export default async function KarirPage() {
   const stats = [
     { value: String(resources.length), label: "Resource Aktif" },
     { value: String(platformCount), label: "Platform Karir" },
-    { value: String(opportunities.length), label: "Opportunity Aktif" },
   ];
 
   return (
@@ -249,7 +204,7 @@ export default async function KarirPage() {
 
         <section className="bg-base-white px-4 pb-12 pt-6 sm:px-6 sm:pb-14 sm:pt-7 lg:px-8 lg:pb-16">
           <div className="mx-auto mt-0 max-w-[1280px]">
-            <div className="grid gap-4 md:grid-cols-3 md:gap-6">
+            <div className="grid gap-4 md:grid-cols-2 md:gap-6">
               {stats.map((stat) => (
                 <article
                   key={stat.label}
@@ -376,46 +331,6 @@ export default async function KarirPage() {
           </div>
         </section>
 
-        <section className="bg-base-cream px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14">
-          <div className="mx-auto max-w-[1280px]">
-            <div>
-              <h2 className="section-title text-[34px] leading-none sm:text-[42px] lg:text-[48px]">
-                Career Opportunities
-              </h2>
-              <p className="mt-3 max-w-[780px] font-body text-[15px] leading-7 text-copy-muted sm:text-[18px]">
-                Lowongan dan peluang aktif langsung dari endpoint `career/opportunities`.
-              </p>
-            </div>
-
-            {opportunities.length > 0 ? (
-              <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                {opportunities.map((item) => (
-                  <CareerCard
-                    key={item.id}
-                    type={getOpportunityType(item)}
-                    title={item.title}
-                    organizer={item.organization}
-                    description={item.description}
-                    deadline={formatOpportunityDeadline(item.closes_at)}
-                    ctaLabel="Lihat Peluang"
-                    href={item.apply_url}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="mt-8 rounded-[20px] border border-dashed border-panel-border bg-base-white px-6 py-12 text-center">
-                <p className="font-headline text-[28px] text-primary">
-                  Belum ada opportunity aktif.
-                </p>
-                <p className="mx-auto mt-3 max-w-[620px] text-[15px] leading-7 text-copy-soft">
-                  Endpoint peluang karir belum mengirim data published yang bisa
-                  ditampilkan di frontend.
-                </p>
-              </div>
-            )}
-          </div>
-        </section>
-
         <section className="bg-base-white px-4 pb-10 sm:px-6 sm:pb-12 lg:px-8">
           <div className="mx-auto max-w-[1280px]">
             <div>
@@ -454,17 +369,14 @@ export default async function KarirPage() {
                         className="flex items-center justify-between gap-4 rounded-[14px] px-3 py-3 transition hover:bg-surface-subtle"
                       >
                         <div className="flex min-w-0 items-center gap-3">
-                          <div
-                            className={[
-                              "flex h-12 w-12 shrink-0 items-center justify-center rounded-[12px] font-tagline text-[13px] font-bold",
-                              item.accent,
-                            ].join(" ")}
-                          >
-                            {item.name
-                              .split(" ")
-                              .map((word) => word[0])
-                              .join("")
-                              .slice(0, 2)}
+                          <div className="relative flex h-14 w-16 shrink-0 items-center justify-center rounded-[12px] border border-[#e5edf3] bg-base-white p-2">
+                            <Image
+                              src={item.logoSrc}
+                              alt={`${item.name} logo`}
+                              width={72}
+                              height={48}
+                              className="max-h-full w-full object-contain"
+                            />
                           </div>
                           <div className="min-w-0">
                             <div className="truncate font-tagline text-[16px] font-bold text-primary">

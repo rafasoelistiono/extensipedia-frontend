@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, League_Spartan, Lilita_One } from "next/font/google";
 import "./globals.css";
 
@@ -23,6 +23,22 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Extensipedia",
   description: "Pusat Keunggulan Akademik Mahasiswa Ekstensi",
+  icons: {
+    icon: [
+      {
+        url: "/favicons/favicon-16x16.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
+    ],
+  },
+  other: {
+    "msapplication-TileColor": "#ffffff",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({

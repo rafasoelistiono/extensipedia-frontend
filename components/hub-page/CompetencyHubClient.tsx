@@ -29,7 +29,7 @@ type CompetencyHubClientProps = {
 };
 
 const ITEMS_PER_PAGE = 6;
-const WINNER_SLIDE_SLOT_COUNT = 6;
+const WINNER_SLIDE_SLOT_COUNT = 5;
 
 type WinnerSlideSlot = {
   slot: number;

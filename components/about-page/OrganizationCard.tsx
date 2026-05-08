@@ -5,6 +5,8 @@ type OrganizationCardProps = {
   role: string;
   unit: string;
   image: string;
+  instagram: string;
+  linkedin?: string;
   imageClassName?: string;
 };
 
@@ -13,6 +15,8 @@ export function OrganizationCard({
   role,
   unit,
   image,
+  instagram,
+  linkedin,
   imageClassName,
 }: OrganizationCardProps) {
   return (
@@ -45,19 +49,25 @@ export function OrganizationCard({
 
       <div className="mt-4 flex gap-[13px]">
         <a
-          href="#"
+          href={`https://www.instagram.com/${instagram}/`}
+          target="_blank"
+          rel="noreferrer"
           className="flex h-8 w-[120px] items-center justify-center gap-2 rounded-[8px] border border-primary bg-base-white font-tagline text-[15px] font-medium text-primary"
         >
           <Instagram className="h-4 w-4" />
           Instagram
         </a>
-        <a
-          href="#"
-          className="flex h-8 w-[120px] items-center justify-center gap-2 rounded-[8px] border border-primary bg-base-white font-tagline text-[15px] font-medium text-primary"
-        >
-          <Linkedin className="h-4 w-4" />
-          LinkedIn
-        </a>
+        {linkedin ? (
+          <a
+            href={linkedin}
+            target="_blank"
+            rel="noreferrer"
+            className="flex h-8 w-[120px] items-center justify-center gap-2 rounded-[8px] border border-primary bg-base-white font-tagline text-[15px] font-medium text-primary"
+          >
+            <Linkedin className="h-4 w-4" />
+            LinkedIn
+          </a>
+        ) : null}
       </div>
     </article>
   );

@@ -10,6 +10,8 @@ type OrganizationMember = {
   role: string;
   unit: string;
   image: string;
+  instagram: string;
+  linkedin?: string;
   imageClassName?: string;
 };
 

@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   title: "Career Center | Extensipedia",
 };
 
-export const revalidate = 600;
+export const revalidate = 300;
 
 const getawayGroups = [
   {

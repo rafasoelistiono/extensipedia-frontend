@@ -236,7 +236,7 @@ export async function getAcademicServices(query?: {
 export async function getAcademicYoutube() {
   return request<ApiResponse<AcademicYoutubeSection>>(
     "/api/v1/public/academic/youtube/",
-    { next: { revalidate: 600, tags: ["academic-youtube"] } },
+    { next: { revalidate: 300, tags: ["academic-youtube"] } },
   );
 }
 
@@ -274,7 +274,7 @@ export async function getAcademicRepository() {
     }>
   >(
     "/api/v1/public/academic/repository/",
-    { next: { revalidate: 600, tags: ["academic-repository"] } },
+    { next: { revalidate: 300, tags: ["academic-repository"] } },
   );
 }
 
@@ -310,7 +310,7 @@ export async function getCompetencyWinnerSlides(query?: {
 }) {
   return request<ApiResponse<Paginated<CompetencyWinnerSlide>>>(
     "/api/v1/public/competency/winner-slides/",
-    { next: { revalidate: 600, tags: ["competency-winners"] } },
+    { next: { revalidate: 300, tags: ["competency-winners"] } },
     query,
   );
 }
@@ -327,14 +327,14 @@ export async function getCabinetCalendar() {
     }>
   >(
     "/api/v1/public/about/cabinet-calendar/",
-    { next: { revalidate: 600, tags: ["cabinet-calendar"] } },
+    { next: { revalidate: 300, tags: ["cabinet-calendar"] } },
   );
 }
 
 export async function getCareerResources() {
   return request<ApiResponse<CareerResources>>(
     "/api/v1/public/career/resources/",
-    { next: { revalidate: 600, tags: ["career-resources"] } },
+    { next: { revalidate: 300, tags: ["career-resources"] } },
   );
 }
 

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { ProgramCard } from "@/components/about-page/ProgramCard";
+import type { AboutTentangKami } from "@/lib/public-api";
 
 const currentPageProgramHref = "#program-kerja-unggulan";
 
@@ -29,17 +30,19 @@ const programHubs = [
         title: "Extensipedia",
         description: "Website pusat materi dan bank soal terpadu.",
         icon: AppWindow,
-        href: currentPageProgramHref,
+        linkKey: "extensipedia_link",
       },
       {
         title: "Study Boost & Exam Blast",
         description: "Tutorial menjelang ujian dan sistem peringatan jadwal.",
         icon: Clock,
+        linkKey: "study_boost_exam_blast_link",
       },
       {
         title: "Fun Enlightenment",
         description: 'Workshop AI Mastery dan strategi "SIAK War".',
         icon: Sparkles,
+        linkKey: "fun_enlightenment_link",
       },
     ],
   },
@@ -53,18 +56,21 @@ const programHubs = [
         description:
           "Bimbingan sertifikasi dan persiapan dunia kerja profesional.",
         icon: TrendingUp,
+        linkKey: "career_catalyst_link",
       },
       {
         title: "EXPLORE",
         description:
           "Forum silaturahmi dan networking strategis dengan alumni.",
         icon: LinkIcon,
+        linkKey: "explore_link",
       },
       {
         title: "Business Partnership",
         description:
           "Pengelolaan dana usaha dan kemitraan eksternal.",
         icon: Briefcase,
+        linkKey: "business_partnership_link",
       },
     ],
   },
@@ -78,18 +84,21 @@ const programHubs = [
         description:
           "Kanal pengaduan masalah akademik dan fasilitas kampus.",
         icon: Megaphone,
+        linkKey: "jaring_aspirasi_link",
       },
       {
         title: "Kajian Strategis",
         description:
           "Analisis kritis isu sosial-ekonomi dan kebijakan kampus.",
         icon: FileText,
+        linkKey: "kajian_strategis_link",
       },
       {
         title: "Bincang Sekma",
         description:
           "Forum diskusi langsung dengan Sekretariat PE FEB UI.",
         icon: Users,
+        linkKey: "bincang_sekma_link",
       },
     ],
   },
@@ -103,24 +112,83 @@ const programHubs = [
         description:
           "Aksi sosial dan pengabdian masyarakat yang berdampak.",
         icon: Heart,
+        linkKey: "reach_project_link",
       },
       {
         title: "Talent Interest",
         description:
           "Wadah pengembangan hobi, olahraga, dan kreativitas mahasiswa.",
         icon: Palette,
+        linkKey: "talent_interest_link",
       },
       {
         title: "Branding & Dokumentasi",
         description:
           "Pengelolaan visual dan identitas publik kabinet.",
         icon: Camera,
+        linkKey: "branding_dokumentasi_link",
       },
     ],
   },
 ];
 
-export function FeaturedProgramsTabs() {
+function findStringByKey(source: unknown, key: string): string | null {
+  if (!source || typeof source !== "object") {
+    return null;
+  }
+
+  if (Array.isArray(source)) {
+    for (const item of source) {
+      const value = findStringByKey(item, key);
+
+      if (value) {
+        return value;
+      }
+    }
+
+    return null;
+  }
+
+  const record = source as Record<string, unknown>;
+  const directValue = record[key];
+
+  if (typeof directValue === "string" && directValue.trim()) {
+    return directValue.trim();
+  }
+
+  for (const value of Object.values(record)) {
+    const nestedValue = findStringByKey(value, key);
+
+    if (nestedValue) {
+      return nestedValue;
+    }
+  }
+
+  return null;
+}
+
+function getProgramHref(
+  source: AboutTentangKami | null,
+  key: keyof AboutTentangKami,
+) {
+  if (!source) {
+    return currentPageProgramHref;
+  }
+
+  const directValue = source[key];
+
+  if (typeof directValue === "string" && directValue.trim()) {
+    return directValue.trim();
+  }
+
+  return findStringByKey(source.program_detail_links, key) ?? currentPageProgramHref;
+}
+
+type FeaturedProgramsTabsProps = {
+  programLinks?: AboutTentangKami | null;
+};
+
+export function FeaturedProgramsTabs({ programLinks = null }: FeaturedProgramsTabsProps) {
   const [activeHubIndex, setActiveHubIndex] = useState(0);
 
   const activeHub = programHubs[activeHubIndex];
@@ -159,7 +227,7 @@ export function FeaturedProgramsTabs() {
         {activeHub.programs.map((program) => (
           <ProgramCard
             key={program.title}
-            href={program.href ?? currentPageProgramHref}
+            href={getProgramHref(programLinks, program.linkKey as keyof AboutTentangKami)}
             {...program}
           />
         ))}

@@ -11,6 +11,7 @@ import { TicketTracker } from "@/components/support-hub/TicketTracker";
 import {
   getCompetencyAgendas,
   getFeaturedAspirations,
+  resolveMediaUrl,
   type CompetencyAgendaItem,
   type FeaturedAspiration,
 } from "@/lib/public-api";
@@ -134,6 +135,7 @@ export default async function Home() {
                   pricing={item.pricing_tag}
                   urgency={item.urgency_tag}
                   recommended={item.recommendation_tag}
+                  headerImageUrl={resolveMediaUrl(item.header_image_url)}
                   registrationLink={item.registration_link}
                   teamFindingLink={item.team_finding_link}
                   googleCalendarLink={item.google_calendar_link}

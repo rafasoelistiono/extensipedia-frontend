@@ -429,6 +429,7 @@ export function CompetencyHubClient({
                     pricing={item.pricing_tag}
                     urgency={item.urgency_tag}
                     recommended={item.recommendation_tag}
+                    headerImageUrl={resolveMediaUrl(item.header_image_url)}
                     registrationLink={item.registration_link}
                     teamFindingLink={item.team_finding_link}
                     googleCalendarLink={item.google_calendar_link}

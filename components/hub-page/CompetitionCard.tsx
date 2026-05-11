@@ -19,6 +19,7 @@ type CompetitionCardProps = {
   pricing: string;
   urgency?: boolean;
   recommended?: boolean;
+  headerImageUrl?: string | null;
   registrationLink?: string | null;
   teamFindingLink?: string | null;
   googleCalendarLink?: string | null;
@@ -45,6 +46,7 @@ export function CompetitionCard({
   pricing,
   urgency = false,
   recommended = false,
+  headerImageUrl,
   registrationLink,
   teamFindingLink,
   googleCalendarLink,
@@ -58,8 +60,26 @@ export function CompetitionCard({
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-[18px] bg-base-white shadow-[0_4px_17px_rgba(0,0,0,0.1)] sm:rounded-[20px]">
-      <div className={`flex min-h-[170px] items-end px-4 pb-4 sm:min-h-[220px] ${toneClassMap[tone]}`}>
-        <div className="flex flex-wrap gap-2">
+      <div
+        className={[
+          "relative flex min-h-[170px] items-end overflow-hidden px-4 pb-4 sm:min-h-[220px]",
+          headerImageUrl ? "bg-primary" : toneClassMap[tone],
+        ].join(" ")}
+      >
+        {headerImageUrl ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={headerImageUrl}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,57,93,0.08)_0%,rgba(3,57,93,0.58)_100%)]" />
+          </>
+        ) : null}
+
+        <div className="relative z-10 flex flex-wrap gap-2">
           {urgency ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-[#ea4445] px-3 py-1 text-[12px] font-bold text-base-white">
               <CircleAlert className="h-3.5 w-3.5" />

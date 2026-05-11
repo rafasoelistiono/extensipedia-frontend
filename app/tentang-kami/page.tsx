@@ -13,7 +13,12 @@ import { Navbar } from "@/components/Navbar";
 import { ScrollReset } from "@/components/ScrollReset";
 import { OrganizationCarousel } from "@/components/about-page/OrganizationCarousel";
 import { SectionHeader } from "@/components/about-page/SectionHeader";
-import { getCabinetCalendar } from "@/lib/public-api";
+import {
+  getAboutTentangKami,
+  getCabinetCalendar,
+  resolveMediaUrl,
+  type AboutTentangKami,
+} from "@/lib/public-api";
 import { FeaturedProgramsTabs } from "@/components/about-page/FeaturedProgramsTabs";
 
 export const metadata: Metadata = {
@@ -187,15 +192,46 @@ const missionItems = [
   },
 ];
 
+const fallbackHeroDescription =
+  "Mengenal lebih dekat lembaga eksekutif mahasiswa yang menggerakkan Extensipedia dan melayani seluruh mahasiswa Ekstensi FEB UI.";
+
+const fallbackAboutParagraphs = [
+  "Badan Eksekutif Mahasiswa Program Ekstensi Fakultas Ekonomi dan Bisnis Universitas Indonesia (BEM PE FEB UI) adalah lembaga eksekutif tertinggi di tingkat program studi. Kami berfungsi sebagai wadah pergerakan, pengembangan diri, dan penyaluran aspirasi mahasiswa Ekstensi FEB UI.",
+  "Kami berperan sebagai jembatan strategis antara mahasiswa dengan pihak Dekanat, alumni, serta mitra eksternal untuk menciptakan lingkungan akademik yang suportif, inklusif, dan profesional.",
+];
+
+function getDescriptionParagraphs(description?: string | null) {
+  if (!description?.trim()) {
+    return fallbackAboutParagraphs;
+  }
+
+  return description
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+}
+
 export default async function TentangKamiPage() {
   let cabinetCalendarEmbedUrl: string | null = null;
+  let aboutContent: AboutTentangKami | null = null;
 
-  try {
-    const response = await getCabinetCalendar();
-    cabinetCalendarEmbedUrl = response.data.embed_url;
-  } catch {
-    cabinetCalendarEmbedUrl = null;
+  const [aboutResult, calendarResult] = await Promise.allSettled([
+    getAboutTentangKami(),
+    getCabinetCalendar(),
+  ]);
+
+  if (aboutResult.status === "fulfilled") {
+    aboutContent = aboutResult.value.data;
   }
+
+  if (calendarResult.status === "fulfilled") {
+    cabinetCalendarEmbedUrl = calendarResult.value.data.embed_url;
+  }
+
+  const resolvedHeroBackground = resolveMediaUrl(aboutContent?.image) ?? heroBackground;
+  const heroDescription = aboutContent?.subtitle?.trim() || fallbackHeroDescription;
+  const aboutTitle = aboutContent?.title?.trim() || "Mengenal BEM PE FEB UI";
+  const aboutParagraphs = getDescriptionParagraphs(aboutContent?.description);
 
   return (
     <div className="min-h-screen bg-base-white text-primary">
@@ -206,7 +242,7 @@ export default async function TentangKamiPage() {
         <section className="relative overflow-hidden bg-primary">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={heroBackground}
+            src={resolvedHeroBackground}
             alt="Anggota kabinet Gema Cita Bersama"
             className="absolute inset-0 h-full w-full object-cover opacity-70"
           />
@@ -226,9 +262,7 @@ export default async function TentangKamiPage() {
                 Tentang Kami
               </h1>
               <p className="mt-4 max-w-[992px] font-body text-[15px] leading-[1.65] text-base-white sm:text-[20px] sm:leading-[1.5]">
-                Mengenal lebih dekat lembaga eksekutif mahasiswa yang
-                menggerakkan Extensipedia dan melayani seluruh mahasiswa
-                Ekstensi FEB UI.
+                {heroDescription}
               </p>
             </div>
           </div>
@@ -239,23 +273,12 @@ export default async function TentangKamiPage() {
             <div className="flex flex-col gap-6">
               <div>
                 <h2 className="section-title text-[30px] leading-none sm:text-[40px] lg:text-[48px]">
-                  Mengenal BEM PE FEB UI
+                  {aboutTitle}
                 </h2>
                 <div className="mt-5 space-y-3 text-justify font-body text-[14px] leading-[1.85] text-copy-muted sm:text-[16px] sm:leading-[1.9]">
-                  <p>
-                    Badan Eksekutif Mahasiswa Program Ekstensi Fakultas
-                    Ekonomi dan Bisnis Universitas Indonesia (BEM PE FEB UI)
-                    adalah lembaga eksekutif tertinggi di tingkat program
-                    studi. Kami berfungsi sebagai wadah pergerakan,
-                    pengembangan diri, dan penyaluran aspirasi mahasiswa
-                    Ekstensi FEB UI.
-                  </p>
-                  <p>
-                    Kami berperan sebagai jembatan strategis antara mahasiswa
-                    dengan pihak Dekanat, alumni, serta mitra eksternal untuk
-                    menciptakan lingkungan akademik yang suportif, inklusif,
-                    dan profesional.
-                  </p>
+                  {aboutParagraphs.map((paragraph) => (
+                    <p key={paragraph}>{paragraph}</p>
+                  ))}
                 </div>
               </div>
 
@@ -455,7 +478,7 @@ export default async function TentangKamiPage() {
               title="Hub Program Kerja Unggulan"
             />
 
-            <FeaturedProgramsTabs />
+            <FeaturedProgramsTabs programLinks={aboutContent} />
           </div>
         </section>
 

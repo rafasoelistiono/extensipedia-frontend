@@ -85,6 +85,7 @@ export type CompetencyAgendaItem = {
   id: string;
   title: string;
   short_description: string;
+  header_image_url: string | null;
   urgency_tag: boolean;
   recommendation_tag: boolean;
   category_tag: string;
@@ -112,6 +113,29 @@ export type CareerResources = {
   portfolio_guide: string;
   salary_script: string;
   case_study_interview_prep: string;
+};
+
+export type AboutProgramDetailLinks = Record<string, unknown>;
+
+export type AboutTentangKami = {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  image: string | null;
+  extensipedia_link: string | null;
+  study_boost_exam_blast_link: string | null;
+  fun_enlightenment_link: string | null;
+  career_catalyst_link: string | null;
+  explore_link: string | null;
+  business_partnership_link: string | null;
+  jaring_aspirasi_link: string | null;
+  kajian_strategis_link: string | null;
+  bincang_sekma_link: string | null;
+  reach_project_link: string | null;
+  talent_interest_link: string | null;
+  branding_dokumentasi_link: string | null;
+  program_detail_links: AboutProgramDetailLinks | null;
 };
 
 export type CareerOpportunity = {
@@ -328,6 +352,13 @@ export async function getCabinetCalendar() {
   >(
     "/api/v1/public/about/cabinet-calendar/",
     { next: { revalidate: 300, tags: ["cabinet-calendar"] } },
+  );
+}
+
+export async function getAboutTentangKami() {
+  return request<ApiResponse<AboutTentangKami>>(
+    "/api/v1/public/about/tentang-kami/",
+    { next: { revalidate: 300, tags: ["about-tentang-kami"] } },
   );
 }
 

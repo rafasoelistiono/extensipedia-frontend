@@ -573,11 +573,11 @@ export function CompetencyHubClient({
                 href="https://www.instagram.com/bempefebui/"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex h-10 items-center justify-center gap-2 self-start rounded-[10px] bg-primary px-4 font-tagline text-[14px] font-semibold text-base-white sm:text-[15px] lg:w-[225px]"
+                className="inline-flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-[10px] bg-primary px-6 font-tagline text-[18px] font-semibold leading-none !text-white transition hover:bg-[#0a4c79] sm:w-auto sm:min-w-[225px] lg:h-[44px] lg:self-center [&_svg]:!text-white"
                 aria-label="Notify us on Instagram"
               >
                 <span>Notify Us</span>
-                <ArrowUpRight className="h-4 w-4" />
+                <ArrowUpRight className="h-5 w-5" strokeWidth={2.2} />
               </a>
             </div>
           </div>

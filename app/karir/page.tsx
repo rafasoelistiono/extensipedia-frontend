@@ -135,7 +135,7 @@ function buildResourceCards(resourceLinks: CareerResources | null): ResourceCard
     {
       title: "Interview Prep",
       description:
-        "Panduan menyusun portfolio berbasis hasil untuk jalur manajerial dan spesialis.",
+        "Panduan mempersiapkan wawancara berbasis hasil untuk jalur manajerial dan spesialis.",
       badge: "Guide",
       badgeTone: "lavender",
       icon: NotebookText,
@@ -229,14 +229,14 @@ export default async function KarirPage() {
             </div>
 
             {resources.length > 0 ? (
-              <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+              <div className="mt-8 grid auto-rows-fr gap-5 md:grid-cols-2 xl:grid-cols-4">
                 {resources.map((resource) => {
                   const Icon = resource.icon;
 
                   return (
                     <article
                       key={resource.title}
-                      className="flex h-full flex-col rounded-[20px] border border-[#e5edf3] bg-base-white p-5 shadow-[0_6px_20px_rgba(3,57,93,0.08)]"
+                      className="flex h-full min-h-[360px] flex-col rounded-[20px] border border-[#e5edf3] bg-base-white p-5 shadow-[0_6px_20px_rgba(3,57,93,0.08)]"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-surface-muted text-primary">
@@ -252,7 +252,7 @@ export default async function KarirPage() {
                         </span>
                       </div>
 
-                      <div className="mt-5">
+                      <div className="mt-5 flex-1">
                         <h3 className="font-tagline text-[18px] font-bold text-primary">
                           {resource.title}
                         </h3>
@@ -265,7 +265,7 @@ export default async function KarirPage() {
                         href={resource.href}
                         target="_blank"
                         rel="noreferrer"
-                        className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-primary px-4 font-tagline text-[14px] font-semibold !text-white transition hover:brightness-110 [&_svg]:!text-white"
+                        className="mt-auto inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-primary px-4 font-tagline text-[14px] font-semibold !text-white transition hover:brightness-110 [&_svg]:!text-white"
                       >
                         <Download className="h-4 w-4" />
                         Buka Resource

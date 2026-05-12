@@ -1,4 +1,4 @@
-import { Instagram, Mail, MessageCircleMore } from "lucide-react";
+import { Instagram, Mail, MessageCircleMore, Youtube } from "lucide-react";
 import Image from "next/image";
 
 export function Footer() {
@@ -8,14 +8,21 @@ export function Footer() {
         <div className="mx-auto w-full max-w-[1180px] px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
           <div className="grid gap-10 md:grid-cols-2 md:items-start">
             <div className="text-center md:text-left">
-              <div className="flex flex-col items-center gap-3 md:flex-row md:items-start">
-                <div className="h-14 w-auto">
+              <div className="flex flex-col items-center gap-3 md:flex-row md:items-center">
+                <div className="flex items-center justify-center gap-3 md:justify-start">
+                  <Image
+                    src="/header-logo.svg"
+                    alt="Logo GCB"
+                    width={180}
+                    height={56}
+                    className="block h-15 w-auto shrink-0 object-contain"
+                  />
                   <Image
                     src="/gcb-logo.svg"
                     alt="Logo GCB"
                     width={180}
                     height={56}
-                    className="h-14 w-auto object-contain"
+                    className="block h-14 w-auto shrink-0 object-contain"
                   />
                 </div>
 
@@ -57,12 +64,12 @@ export function Footer() {
                 </a>
 
                 <a
-                  href="https://www.youtube.com/@extensipedia"
+                  href="https://www.youtube.com/@bempefebui"
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center justify-center gap-3 transition hover:text-cta md:justify-start"
                 >
-                  <MessageCircleMore className="h-4 w-4" />
+                  <Youtube className="h-4 w-4" />
                   Extensipedia by BEM PE FEB UI
                 </a>
 

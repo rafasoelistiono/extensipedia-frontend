@@ -26,11 +26,12 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/favicons/favicon-16x16.png",
-        sizes: "16x16",
-        type: "image/png",
+        url: "/header-logo.svg",
+        type: "image/svg+xml",
       },
     ],
+    shortcut: "/header-logo.svg",
+    apple: "/header-logo.svg",
   },
   other: {
     "msapplication-TileColor": "#ffffff",

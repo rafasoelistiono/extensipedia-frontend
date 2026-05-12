@@ -119,13 +119,6 @@ function SupportContactCard() {
 
       <div className="mt-5 space-y-3">
         <a
-          href="#"
-          className="flex h-10 items-center justify-center gap-2 rounded-[10px] bg-cta px-4 font-tagline text-[14px] font-bold text-primary transition hover:brightness-95"
-        >
-          <MessageCircleMore className="h-4 w-4" />
-          WhatsApp INADVOK
-        </a>
-        <a
           href="https://www.instagram.com/bempefebui/"
           target="_blank"
           rel="noreferrer"

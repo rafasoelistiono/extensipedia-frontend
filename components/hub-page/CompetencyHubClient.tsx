@@ -569,14 +569,16 @@ export function CompetencyHubClient({
                 </p>
               </div>
 
-              <button
-                type="button"
+              <a
+                href="https://www.instagram.com/bempefebui/"
+                target="_blank"
+                rel="noreferrer"
                 className="inline-flex h-10 items-center justify-center gap-2 self-start rounded-[10px] bg-primary px-4 font-tagline text-[14px] font-semibold text-base-white sm:text-[15px] lg:w-[225px]"
-                aria-label="Notify Us"
+                aria-label="Notify us on Instagram"
               >
                 <span>Notify Us</span>
                 <ArrowUpRight className="h-4 w-4" />
-              </button>
+              </a>
             </div>
           </div>
         </div>

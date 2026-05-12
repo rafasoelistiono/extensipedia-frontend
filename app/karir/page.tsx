@@ -102,7 +102,6 @@ const getawayToneClassMap = {
 type ResourceCardConfig = {
   title: string;
   description: string;
-  meta: string;
   badge: string;
   badgeTone: keyof typeof resourceBadgeClassMap;
   icon: typeof FileText;
@@ -119,7 +118,6 @@ function buildResourceCards(resourceLinks: CareerResources | null): ResourceCard
       title: "CV Templates",
       description:
         "Master template CV yang telah lulus sistem screening otomatis Big 4, Tech Giants, dan FMCG.",
-      meta: "6 template tersedia - DOC & PDF",
       badge: "ATS",
       badgeTone: "success",
       icon: FileText,
@@ -129,17 +127,15 @@ function buildResourceCards(resourceLinks: CareerResources | null): ResourceCard
       title: "Cover Letter",
       description:
         "Template cover letter profesional dengan struktur yang terbukti meningkatkan response rate hingga 3x lipat.",
-      meta: "4 template tersedia - DOC & PDF",
       badge: "ATS",
       badgeTone: "info",
       icon: BadgeCheck,
       href: resolveMediaUrl(resourceLinks?.cover_letter),
     },
     {
-      title: "Portfolio Guide",
+      title: "Interview Prep",
       description:
         "Panduan menyusun portfolio berbasis hasil untuk jalur manajerial dan spesialis.",
-      meta: "2 framework tersedia - PDF",
       badge: "Guide",
       badgeTone: "lavender",
       icon: NotebookText,
@@ -149,7 +145,6 @@ function buildResourceCards(resourceLinks: CareerResources | null): ResourceCard
       title: "Salary Script",
       description:
         "Skrip negosiasi gaji dan kompensasi yang efektif untuk fresh graduate dan career switcher.",
-      meta: "3 skenario tersedia - PDF",
       badge: "Hot",
       badgeTone: "warning",
       icon: CircleDollarSign,
@@ -263,9 +258,6 @@ export default async function KarirPage() {
                         </h3>
                         <p className="mt-3 font-body text-[14px] leading-7 text-copy-muted">
                           {resource.description}
-                        </p>
-                        <p className="mt-3 font-body text-[12px] font-semibold text-copy-soft">
-                          {resource.meta}
                         </p>
                       </div>
 

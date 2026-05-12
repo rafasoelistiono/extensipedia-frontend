@@ -35,11 +35,12 @@ export function Navbar() {
       <nav className="mx-auto flex h-[73px] w-full max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex shrink-0 items-center" onClick={() => setIsOpen(false)}>
           <Image
-            src="/header-logo-2.png"
+            src="/header-extensipedia.png"
             alt="Logo Extensipedia"
-            width={56}
-            height={56}
-            className="h-10 w-10 object-contain sm:h-[55px] sm:w-[55px]"
+            width={3364}
+            height={579}
+            sizes="(min-width: 640px) 186px, 116px"
+            className="h-5 w-auto object-contain sm:h-8"
             priority
           />
         </Link>

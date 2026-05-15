@@ -25,7 +25,7 @@ export default async function KompetensiKarirPage() {
     const [agendasResponse, winnerSlidesResponse] = await Promise.all([
       getCompetencyAgendas({
         page_size: 50,
-        ordering: "-created_at,-updated_at,deadline_date,title",
+        ordering: "deadline_date,title",
       }),
       getCompetencyWinnerSlides({
         page_size: 6,

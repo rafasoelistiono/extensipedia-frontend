@@ -80,6 +80,22 @@ function getMonthOptions(items: CompetencyAgendaItem[]) {
   ).sort((left, right) => Number(left) - Number(right));
 }
 
+function compareAgendaByNearestDeadline(
+  left: CompetencyAgendaItem,
+  right: CompetencyAgendaItem,
+) {
+  const leftDeadline = new Date(left.deadline_date).getTime();
+  const rightDeadline = new Date(right.deadline_date).getTime();
+  const leftSortValue = Number.isNaN(leftDeadline) ? Number.POSITIVE_INFINITY : leftDeadline;
+  const rightSortValue = Number.isNaN(rightDeadline) ? Number.POSITIVE_INFINITY : rightDeadline;
+
+  if (leftSortValue !== rightSortValue) {
+    return leftSortValue - rightSortValue;
+  }
+
+  return left.title.localeCompare(right.title, "id-ID");
+}
+
 export function CompetencyHubClient({
   items,
   winnerSlides,
@@ -101,52 +117,54 @@ export function CompetencyHubClient({
   const filteredItems = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return items.filter((item) => {
-      const deadline = new Date(item.deadline_date);
-      const matchesSearch =
-        !query ||
-        item.title.toLowerCase().includes(query) ||
-        item.short_description.toLowerCase().includes(query) ||
-        item.category_tag.toLowerCase().includes(query) ||
-        item.scope_tag.toLowerCase().includes(query) ||
-        item.pricing_tag.toLowerCase().includes(query);
+    return items
+      .filter((item) => {
+        const deadline = new Date(item.deadline_date);
+        const matchesSearch =
+          !query ||
+          item.title.toLowerCase().includes(query) ||
+          item.short_description.toLowerCase().includes(query) ||
+          item.category_tag.toLowerCase().includes(query) ||
+          item.scope_tag.toLowerCase().includes(query) ||
+          item.pricing_tag.toLowerCase().includes(query);
 
-      const matchesYear =
-        selectedYear === "all" ||
-        (!Number.isNaN(deadline.getTime()) &&
-          String(deadline.getFullYear()) === selectedYear);
+        const matchesYear =
+          selectedYear === "all" ||
+          (!Number.isNaN(deadline.getTime()) &&
+            String(deadline.getFullYear()) === selectedYear);
 
-      const matchesMonth =
-        selectedMonth === "all" ||
-        (!Number.isNaN(deadline.getTime()) &&
-          String(deadline.getMonth()) === selectedMonth);
+        const matchesMonth =
+          selectedMonth === "all" ||
+          (!Number.isNaN(deadline.getTime()) &&
+            String(deadline.getMonth()) === selectedMonth);
 
-      const matchesCategory =
-        categoryFilter === "all" ||
-        item.category_tag.toLowerCase() === categoryFilter;
+        const matchesCategory =
+          categoryFilter === "all" ||
+          item.category_tag.toLowerCase() === categoryFilter;
 
-      const matchesScope =
-        scopeFilter === "all" || item.scope_tag.toLowerCase() === scopeFilter;
+        const matchesScope =
+          scopeFilter === "all" || item.scope_tag.toLowerCase() === scopeFilter;
 
-      const matchesPricing =
-        pricingFilter === "all" ||
-        item.pricing_tag.toLowerCase() === pricingFilter;
+        const matchesPricing =
+          pricingFilter === "all" ||
+          item.pricing_tag.toLowerCase() === pricingFilter;
 
-      const matchesUrgency = !urgencyOnly || item.urgency_tag;
-      const matchesRecommendation =
-        !recommendationOnly || item.recommendation_tag;
+        const matchesUrgency = !urgencyOnly || item.urgency_tag;
+        const matchesRecommendation =
+          !recommendationOnly || item.recommendation_tag;
 
-      return (
-        matchesSearch &&
-        matchesYear &&
-        matchesMonth &&
-        matchesCategory &&
-        matchesScope &&
-        matchesPricing &&
-        matchesUrgency &&
-        matchesRecommendation
-      );
-    });
+        return (
+          matchesSearch &&
+          matchesYear &&
+          matchesMonth &&
+          matchesCategory &&
+          matchesScope &&
+          matchesPricing &&
+          matchesUrgency &&
+          matchesRecommendation
+        );
+      })
+      .sort(compareAgendaByNearestDeadline);
   }, [
     categoryFilter,
     items,

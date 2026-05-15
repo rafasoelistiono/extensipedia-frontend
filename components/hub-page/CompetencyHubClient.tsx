@@ -18,6 +18,7 @@ import {
   type CompetencyWinnerSlide,
 } from "@/lib/public-api";
 import {
+  compareAgendaByNearestDeadline,
   competencyDeadlineFormatter,
   getCompetencyCountdownLabel,
   getCompetencyTone,
@@ -78,22 +79,6 @@ function getMonthOptions(items: CompetencyAgendaItem[]) {
         .map((date) => String(date.getMonth())),
     ),
   ).sort((left, right) => Number(left) - Number(right));
-}
-
-function compareAgendaByNearestDeadline(
-  left: CompetencyAgendaItem,
-  right: CompetencyAgendaItem,
-) {
-  const leftDeadline = new Date(left.deadline_date).getTime();
-  const rightDeadline = new Date(right.deadline_date).getTime();
-  const leftSortValue = Number.isNaN(leftDeadline) ? Number.POSITIVE_INFINITY : leftDeadline;
-  const rightSortValue = Number.isNaN(rightDeadline) ? Number.POSITIVE_INFINITY : rightDeadline;
-
-  if (leftSortValue !== rightSortValue) {
-    return leftSortValue - rightSortValue;
-  }
-
-  return left.title.localeCompare(right.title, "id-ID");
 }
 
 export function CompetencyHubClient({

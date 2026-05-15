@@ -16,6 +16,7 @@ import {
   type FeaturedAspiration,
 } from "@/lib/public-api";
 import {
+  compareAgendaByNearestDeadline,
   competencyDeadlineFormatter,
   getCompetencyCountdownLabel,
   getCompetencyTone,
@@ -74,14 +75,16 @@ export default async function Home() {
 
   const [agendaResult, aspirationResult] = await Promise.allSettled([
     getCompetencyAgendas({
-      page_size: 3,
-      ordering: "-created_at,-updated_at,deadline_date,title",
+      page_size: 50,
+      ordering: "deadline_date,title",
     }),
     getFeaturedAspirations(),
   ]);
 
   if (agendaResult.status === "fulfilled") {
-    agendas = agendaResult.value.data.items.slice(0, 3);
+    agendas = agendaResult.value.data.items
+      .toSorted(compareAgendaByNearestDeadline)
+      .slice(0, 3);
   }
 
   if (aspirationResult.status === "fulfilled") {

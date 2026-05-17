@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { Navbar } from "@/components/Navbar";
 import { ScrollReset } from "@/components/ScrollReset";
+import { TrackedLink } from "@/components/TrackedLink";
 import { TicketTracker } from "@/components/support-hub/TicketTracker";
 import {
   getCompetencyAgendas,
@@ -37,6 +38,7 @@ const featureItems: FeatureItem[] = [
     ],
     action: "Akses Sekarang",
     href: "/akademik",
+    activityKey: "home.features.academic.access_now",
     outlined: true,
   },
   {
@@ -47,6 +49,7 @@ const featureItems: FeatureItem[] = [
     details: ["Info Kompetisi", "Info Pelatihan"],
     action: "Eksplorasi",
     href: "/kompetensi-karir",
+    activityKey: "home.features.competency.explore",
     highlighted: true,
   },
   {
@@ -57,6 +60,7 @@ const featureItems: FeatureItem[] = [
     details: ["CV & Cover Letter", "Platform Karir"],
     action: "Lihat Resource",
     href: "/karir",
+    activityKey: "home.features.career.view_resource",
   },
   {
     icon: Megaphone,
@@ -66,6 +70,7 @@ const featureItems: FeatureItem[] = [
     details: ["Jaring Aspirasi", "Tracking Tiket"],
     action: "Sampaikan Aspirasi",
     href: "/advokasi",
+    activityKey: "home.features.advocacy.submit_aspiration",
   },
 ];
 
@@ -116,12 +121,16 @@ export default async function Home() {
               </p>
             </div>
 
-            <a
+            <TrackedLink
               href="/kompetensi-karir"
               className="font-tagline text-sm font-semibold text-primary transition hover:text-cta"
+              actionKey="home.competency.view_all"
+              label="Lihat Semua"
+              targetType="internal_link"
+              metadata={{ section: "competency_updates", source: "homepage" }}
             >
               Lihat Semua
-            </a>
+            </TrackedLink>
           </div>
 
           {agendas.length > 0 ? (
@@ -129,6 +138,7 @@ export default async function Home() {
               {agendas.map((item) => (
                 <CompetitionCard
                   key={item.id}
+                  id={item.id}
                   title={item.title}
                   description={item.short_description}
                   deadline={competencyDeadlineFormatter.format(new Date(item.deadline_date))}
@@ -143,6 +153,7 @@ export default async function Home() {
                   teamFindingLink={item.team_finding_link}
                   googleCalendarLink={item.google_calendar_link}
                   tone={getCompetencyTone(item)}
+                  activitySource="home"
                 />
               ))}
             </div>
@@ -176,7 +187,7 @@ export default async function Home() {
           </div>
 
           <div className="mx-auto max-w-[780px]">
-            <TicketTracker />
+            <TicketTracker activitySource="home" />
           </div>
         </div>
       </section>

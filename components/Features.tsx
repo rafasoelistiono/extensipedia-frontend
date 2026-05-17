@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { ArrowRight, ChevronRight } from "lucide-react";
+import { TrackedLink } from "@/components/TrackedLink";
 
 export type FeatureItem = {
   icon: LucideIcon;
@@ -8,6 +9,7 @@ export type FeatureItem = {
   details?: string[];
   action: string;
   href?: string;
+  activityKey?: string;
   highlighted?: boolean;
   outlined?: boolean;
 };
@@ -73,13 +75,21 @@ export function Features({ items }: FeaturesProps) {
                   </ul>
                 ) : null}
 
-                <a
+                <TrackedLink
                   href={item.href ?? "#"}
                   className="font-tagline mt-auto inline-flex items-center gap-2 pt-5 text-[15px] font-semibold text-primary"
+                  actionKey={item.activityKey ?? ""}
+                  label={item.action}
+                  targetType="internal_link"
+                  metadata={{
+                    section: "features",
+                    source: "homepage",
+                    feature_title: item.title,
+                  }}
                 >
                   {item.action}
                   <ArrowRight className="h-4 w-4" />
-                </a>
+                </TrackedLink>
               </article>
             );
           })}

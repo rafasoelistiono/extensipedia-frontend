@@ -6,7 +6,7 @@ type ButtonProps = {
   type?: "button" | "submit" | "reset";
   variant?: "primary" | "secondary" | "ghost";
   className?: string;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
+  onClick?: MouseEventHandler<HTMLElement>;
   disabled?: boolean;
   ariaBusy?: boolean;
 };
@@ -35,7 +35,7 @@ export function Button({
 
   if (href) {
     return (
-      <a href={href} className={classes}>
+      <a href={href} className={classes} onClick={onClick}>
         {children}
       </a>
     );

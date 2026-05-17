@@ -1,3 +1,5 @@
+"use client";
+
 import {
   CalendarDays,
   CalendarPlus2,
@@ -8,8 +10,10 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
+import { trackActivity } from "@/lib/activity";
 
 type CompetitionCardProps = {
+  id?: string;
   title: string;
   description: string;
   deadline: string;
@@ -24,6 +28,7 @@ type CompetitionCardProps = {
   teamFindingLink?: string | null;
   googleCalendarLink?: string | null;
   tone?: "primary" | "sky" | "green";
+  activitySource?: "home";
 };
 
 const toneClassMap = {
@@ -37,6 +42,7 @@ function normalizeTag(value: string) {
 }
 
 export function CompetitionCard({
+  id,
   title,
   description,
   deadline,
@@ -51,12 +57,36 @@ export function CompetitionCard({
   teamFindingLink,
   googleCalendarLink,
   tone = "primary",
+  activitySource,
 }: CompetitionCardProps) {
   const isWorkshop = normalizeTag(category) === "workshop";
   const isCompetition = normalizeTag(category) === "lomba";
   const hasRegistrationLink = Boolean(registrationLink);
   const hasTeamFindingLink = Boolean(teamFindingLink?.trim()) && isCompetition;
   const hasCalendarLink = Boolean(googleCalendarLink);
+
+  function trackHomeAction(
+    actionKey: string,
+    label: string,
+    targetUrl: string | null | undefined,
+  ) {
+    if (activitySource !== "home") {
+      return;
+    }
+
+    trackActivity({
+      action_key: actionKey,
+      label,
+      target_type: "external_link",
+      target_id: id ?? null,
+      target_url: targetUrl ?? null,
+      metadata: {
+        section: "competency_updates",
+        source: "homepage",
+        agenda_title: title,
+      },
+    });
+  }
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-[18px] bg-base-white shadow-[0_4px_17px_rgba(0,0,0,0.1)] sm:rounded-[20px]">
@@ -148,6 +178,15 @@ export function CompetitionCard({
             target={hasRegistrationLink ? "_blank" : undefined}
             rel={hasRegistrationLink ? "noreferrer" : undefined}
             aria-disabled={!hasRegistrationLink}
+            onClick={() => {
+              if (hasRegistrationLink) {
+                trackHomeAction(
+                  "home.competency.register",
+                  "Daftar Sekarang",
+                  registrationLink,
+                );
+              }
+            }}
             className={[
               "flex h-10 flex-1 items-center justify-center rounded-[10px] px-3 font-tagline text-[15px] font-bold whitespace-nowrap sm:text-[16px]",
               hasRegistrationLink
@@ -162,6 +201,9 @@ export function CompetitionCard({
               href={teamFindingLink ?? "#"}
               target="_blank"
               rel="noreferrer"
+              onClick={() =>
+                trackHomeAction("home.competency.find_team", "Cari Tim", teamFindingLink)
+              }
               className="flex h-10 items-center justify-center gap-2 rounded-[10px] bg-[#eef4fb] px-4 font-tagline text-[14px] font-semibold whitespace-nowrap text-primary sm:text-[15px]"
             >
               <Users className="h-4 w-4" />
@@ -173,6 +215,15 @@ export function CompetitionCard({
             target={hasCalendarLink ? "_blank" : undefined}
             rel={hasCalendarLink ? "noreferrer" : undefined}
             aria-disabled={!hasCalendarLink}
+            onClick={() => {
+              if (hasCalendarLink) {
+                trackHomeAction(
+                  "home.competency.add_calendar",
+                  "Kalender",
+                  googleCalendarLink,
+                );
+              }
+            }}
             className={[
               "flex h-10 w-10 items-center justify-center rounded-[10px]",
               hasCalendarLink

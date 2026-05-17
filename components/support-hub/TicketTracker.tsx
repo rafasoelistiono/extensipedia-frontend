@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ArrowUpRight, Search, Ticket } from "lucide-react";
+import { trackActivity } from "@/lib/activity";
 import { Button } from "@/components/ui/Button";
 
 type TicketTracking = {
@@ -17,6 +18,10 @@ type TicketTracking = {
 type TrackingResponse = {
   message?: string;
   data?: TicketTracking;
+};
+
+type TicketTrackerProps = {
+  activitySource?: "home";
 };
 
 function formatStatus(status: string | null) {
@@ -50,7 +55,7 @@ function formatDate(value: string | null) {
   });
 }
 
-export function TicketTracker() {
+export function TicketTracker({ activitySource }: TicketTrackerProps) {
   const [ticketId, setTicketId] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
     "idle",
@@ -64,6 +69,21 @@ export function TicketTracker() {
       setMessage("Masukkan ID tiket terlebih dahulu.");
       setResult(null);
       return;
+    }
+
+    if (activitySource === "home") {
+      trackActivity({
+        action_key: "home.ticket.track",
+        label: "Lacak",
+        target_type: "ticket",
+        target_id: null,
+        target_url: null,
+        metadata: {
+          section: "ticket_tracker",
+          source: "homepage",
+          ticket_id: ticketId.trim(),
+        },
+      });
     }
 
     setStatus("loading");
@@ -187,6 +207,22 @@ export function TicketTracker() {
               </div>
               <a
                 href="/advokasi"
+                onClick={() => {
+                  if (activitySource === "home") {
+                    trackActivity({
+                      action_key: "home.ticket.view_form",
+                      label: "Lihat Form Aspirasi",
+                      target_type: "internal_link",
+                      target_id: null,
+                      target_url: "/advokasi",
+                      metadata: {
+                        section: "ticket_tracker",
+                        source: "homepage",
+                        ticket_id: result?.ticket_id ?? null,
+                      },
+                    });
+                  }
+                }}
                 className="inline-flex h-10 items-center justify-center gap-2 rounded-[8px] bg-primary px-4 font-tagline text-[14px] font-semibold !text-base-white transition hover:bg-[#0a4c79] [&_svg]:!text-base-white"
               >
                 Lihat Form Aspirasi

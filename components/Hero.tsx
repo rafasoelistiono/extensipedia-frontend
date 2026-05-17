@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import { BookOpen, BriefcaseBusiness } from "lucide-react";
+import { trackActivity } from "@/lib/activity";
 import { Button } from "@/components/ui/Button";
 
 export function Hero() {
@@ -38,6 +41,16 @@ export function Hero() {
               href="#akademik"
               variant="primary"
               className="min-h-[48px] w-full max-w-[320px] justify-center rounded-[18px] px-5 py-3 text-[14px] sm:w-auto sm:max-w-none"
+              onClick={() =>
+                trackActivity({
+                  action_key: "home.hero.access_academic",
+                  label: "Akses Bahan Kuliah",
+                  target_type: "internal_link",
+                  target_id: null,
+                  target_url: "#akademik",
+                  metadata: { section: "hero", source: "homepage" },
+                })
+              }
             >
               <BookOpen className="h-4 w-4" />
               Akses Bahan Kuliah
@@ -47,6 +60,16 @@ export function Hero() {
               href="#kompetisi-karir"
               variant="secondary"
               className="min-h-[48px] w-full max-w-[320px] justify-center rounded-[18px] px-5 py-3 text-[14px] sm:w-auto sm:max-w-none"
+              onClick={() =>
+                trackActivity({
+                  action_key: "home.hero.info_competition",
+                  label: "Info Kompetisi",
+                  target_type: "internal_link",
+                  target_id: null,
+                  target_url: "#kompetisi-karir",
+                  metadata: { section: "hero", source: "homepage" },
+                })
+              }
             >
               <BriefcaseBusiness className="h-4 w-4" />
               Info Kompetisi

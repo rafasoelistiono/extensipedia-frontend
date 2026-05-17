@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { LoaderCircle, ThumbsDown, ThumbsUp, Ticket } from "lucide-react";
+import { trackActivity } from "@/lib/activity";
 import { Button } from "@/components/ui/Button";
 
 type AspirasiCardProps = {
@@ -20,6 +21,7 @@ type AspirasiCardProps = {
   createdAt?: string;
   featured?: boolean;
   evidenceImage?: string;
+  activitySource?: "home";
 };
 
 type ActionResponse = {
@@ -77,6 +79,7 @@ export function AspirasiCard({
   createdAt,
   featured = false,
   evidenceImage,
+  activitySource,
 }: AspirasiCardProps) {
   const [showEvidence, setShowEvidence] = useState(false);
   const [upvoteValue, setUpvoteValue] = useState(upvoteCount);
@@ -115,6 +118,22 @@ export function AspirasiCard({
 
       setUpvoteValue(payload.data.upvote_count);
       setVoteValue(payload.data.vote_count);
+
+      if (activitySource === "home") {
+        trackActivity({
+          action_key:
+            action === "upvote" ? "home.aspiration.upvote" : "home.aspiration.downvote",
+          label: action === "upvote" ? "Like Aspirasi" : "Dislike Aspirasi",
+          target_type: "aspiration",
+          target_id: id,
+          target_url: null,
+          metadata: {
+            section: "featured_aspirations",
+            source: "homepage",
+            ticket_id: ticketId ?? null,
+          },
+        });
+      }
     } catch (error) {
       setActionError(
         error instanceof Error

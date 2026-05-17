@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { trackActivity } from "@/lib/activity";
 import { Button } from "@/components/ui/Button";
 
 type AboutProps = {
@@ -119,7 +120,21 @@ export function About({ title, description }: AboutProps) {
               </p>
 
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <Button href="#akademik" variant="primary" className="justify-center sm:px-5">
+                <Button
+                  href="#akademik"
+                  variant="primary"
+                  className="justify-center sm:px-5"
+                  onClick={() =>
+                    trackActivity({
+                      action_key: "home.about.access_academic",
+                      label: "Akses Bahan Kuliah",
+                      target_type: "internal_link",
+                      target_id: null,
+                      target_url: "#akademik",
+                      metadata: { section: "about", source: "homepage" },
+                    })
+                  }
+                >
                   <BookOpen className="h-4 w-4" />
                   Akses Bahan Kuliah
                 </Button>
@@ -128,6 +143,16 @@ export function About({ title, description }: AboutProps) {
                   href="#kompetisi-karir"
                   variant="secondary"
                   className="justify-center sm:px-5"
+                  onClick={() =>
+                    trackActivity({
+                      action_key: "home.about.info_competition",
+                      label: "Info Kompetisi",
+                      target_type: "internal_link",
+                      target_id: null,
+                      target_url: "#kompetisi-karir",
+                      metadata: { section: "about", source: "homepage" },
+                    })
+                  }
                 >
                   <BriefcaseBusiness className="h-4 w-4" />
                   Info Kompetisi

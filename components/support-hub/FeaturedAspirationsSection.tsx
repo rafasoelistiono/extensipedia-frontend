@@ -70,6 +70,7 @@ export function FeaturedAspirationsSection({
                 upvoteCount={item.upvote_count}
                 voteCount={item.vote_count}
                 createdAt={item.created_at}
+                activitySource="home"
               />
             ))}
           </div>

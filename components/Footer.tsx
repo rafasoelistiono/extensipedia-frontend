@@ -1,4 +1,4 @@
-import { Instagram, Mail, MessageCircleMore, Youtube } from "lucide-react";
+import { Instagram, Mail, Youtube } from "lucide-react";
 import Image from "next/image";
 
 export function Footer() {

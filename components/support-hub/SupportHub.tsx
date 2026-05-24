@@ -3,7 +3,6 @@ import {
   ArrowRight,
   BadgeAlert,
   Megaphone,
-  MessageCircleMore,
   ShieldCheck,
   Ticket,
 } from "lucide-react";

@@ -21,6 +21,7 @@ import {
   competencyDeadlineFormatter,
   getCompetencyCountdownLabel,
   getCompetencyTone,
+  isCompetencyAgendaVisible,
 } from "@/lib/competency-ui";
 
 export const revalidate = 120;
@@ -88,6 +89,7 @@ export default async function Home() {
 
   if (agendaResult.status === "fulfilled") {
     agendas = agendaResult.value.data.items
+      .filter(isCompetencyAgendaVisible)
       .toSorted(compareAgendaByNearestDeadline)
       .slice(0, 3);
   }

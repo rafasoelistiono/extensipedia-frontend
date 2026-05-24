@@ -22,6 +22,9 @@ import {
   competencyDeadlineFormatter,
   getCompetencyCountdownLabel,
   getCompetencyTone,
+  getCompetencyTodayDateKey,
+  isCompetencyAgendaVisible,
+  parseCompetencyDeadlineDate,
 } from "@/lib/competency-ui";
 
 type CompetencyHubClientProps = {
@@ -63,9 +66,9 @@ function getYearOptions(items: CompetencyAgendaItem[]) {
   return Array.from(
     new Set(
       items
-        .map((item) => new Date(item.deadline_date))
-        .filter((date) => !Number.isNaN(date.getTime()))
-        .map((date) => String(date.getFullYear())),
+        .map((item) => parseCompetencyDeadlineDate(item.deadline_date))
+        .filter((date) => date !== null)
+        .map((date) => String(date.year)),
     ),
   ).sort();
 }
@@ -74,9 +77,9 @@ function getMonthOptions(items: CompetencyAgendaItem[]) {
   return Array.from(
     new Set(
       items
-        .map((item) => new Date(item.deadline_date))
-        .filter((date) => !Number.isNaN(date.getTime()))
-        .map((date) => String(date.getMonth())),
+        .map((item) => parseCompetencyDeadlineDate(item.deadline_date))
+        .filter((date) => date !== null)
+        .map((date) => String(date.month)),
     ),
   ).sort((left, right) => Number(left) - Number(right));
 }
@@ -96,15 +99,20 @@ export function CompetencyHubClient({
   const [page, setPage] = useState(1);
   const [winnerSlide, setWinnerSlide] = useState(0);
 
-  const yearOptions = useMemo(() => getYearOptions(items), [items]);
-  const monthOptions = useMemo(() => getMonthOptions(items), [items]);
+  const todayDateKey = useMemo(() => getCompetencyTodayDateKey(), []);
+  const visibleItems = useMemo(
+    () => items.filter((item) => isCompetencyAgendaVisible(item, todayDateKey)),
+    [items, todayDateKey],
+  );
+  const yearOptions = useMemo(() => getYearOptions(visibleItems), [visibleItems]);
+  const monthOptions = useMemo(() => getMonthOptions(visibleItems), [visibleItems]);
 
   const filteredItems = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return items
+    return visibleItems
       .filter((item) => {
-        const deadline = new Date(item.deadline_date);
+        const deadline = parseCompetencyDeadlineDate(item.deadline_date);
         const matchesSearch =
           !query ||
           item.title.toLowerCase().includes(query) ||
@@ -115,13 +123,11 @@ export function CompetencyHubClient({
 
         const matchesYear =
           selectedYear === "all" ||
-          (!Number.isNaN(deadline.getTime()) &&
-            String(deadline.getFullYear()) === selectedYear);
+          (deadline !== null && String(deadline.year) === selectedYear);
 
         const matchesMonth =
           selectedMonth === "all" ||
-          (!Number.isNaN(deadline.getTime()) &&
-            String(deadline.getMonth()) === selectedMonth);
+          (deadline !== null && String(deadline.month) === selectedMonth);
 
         const matchesCategory =
           categoryFilter === "all" ||
@@ -152,7 +158,6 @@ export function CompetencyHubClient({
       .sort(compareAgendaByNearestDeadline);
   }, [
     categoryFilter,
-    items,
     pricingFilter,
     recommendationOnly,
     scopeFilter,
@@ -160,6 +165,7 @@ export function CompetencyHubClient({
     selectedMonth,
     selectedYear,
     urgencyOnly,
+    visibleItems,
   ]);
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));

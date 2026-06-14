@@ -17,11 +17,10 @@ import {
   type FeaturedAspiration,
 } from "@/lib/public-api";
 import {
-  compareAgendaByNearestDeadline,
   competencyDeadlineFormatter,
   getCompetencyCountdownLabel,
   getCompetencyTone,
-  isCompetencyAgendaVisible,
+  getTopCompetencyAgendas,
 } from "@/lib/competency-ui";
 
 export const revalidate = 120;
@@ -88,15 +87,19 @@ export default async function Home() {
   ]);
 
   if (agendaResult.status === "fulfilled") {
-    agendas = agendaResult.value.data.items
-      .filter(isCompetencyAgendaVisible)
-      .toSorted(compareAgendaByNearestDeadline)
-      .slice(0, 3);
+    agendas = getTopCompetencyAgendas(agendaResult.value.data.items);
   }
 
   if (aspirationResult.status === "fulfilled") {
     aspirations = aspirationResult.value;
   }
+
+  const agendaGridColumns =
+    agendas.length >= 3
+      ? "lg:grid-cols-3"
+      : agendas.length === 2
+        ? "lg:grid-cols-2 lg:max-w-[780px]"
+        : "lg:grid-cols-1 lg:max-w-[380px]";
 
   return (
     <div className="min-h-screen bg-base-white text-primary">
@@ -119,7 +122,7 @@ export default async function Home() {
                 Update Terbaru
               </h2>
               <p className="section-subtitle mt-2">
-                Tiga agenda kompetensi teratas dari Competency Hub
+                Agenda kompetensi teratas dari Competency Hub
               </p>
             </div>
 
@@ -136,7 +139,7 @@ export default async function Home() {
           </div>
 
           {agendas.length > 0 ? (
-            <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            <div className={`mt-6 grid gap-4 ${agendaGridColumns}`}>
               {agendas.map((item) => (
                 <CompetitionCard
                   key={item.id}

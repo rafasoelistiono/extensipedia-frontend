@@ -114,3 +114,20 @@ export function compareAgendaByNearestDeadline(
 
   return left.title.localeCompare(right.title, "id-ID");
 }
+
+export function getVisibleSortedCompetencyAgendas(
+  items: CompetencyAgendaItem[],
+  todayDateKey = getCompetencyTodayDateKey(),
+) {
+  return items
+    .filter((item) => isCompetencyAgendaVisible(item, todayDateKey))
+    .toSorted(compareAgendaByNearestDeadline);
+}
+
+export function getTopCompetencyAgendas(
+  items: CompetencyAgendaItem[],
+  limit = 3,
+  todayDateKey = getCompetencyTodayDateKey(),
+) {
+  return getVisibleSortedCompetencyAgendas(items, todayDateKey).slice(0, limit);
+}

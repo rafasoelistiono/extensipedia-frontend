@@ -18,12 +18,11 @@ import {
   type CompetencyWinnerSlide,
 } from "@/lib/public-api";
 import {
-  compareAgendaByNearestDeadline,
   competencyDeadlineFormatter,
   getCompetencyCountdownLabel,
   getCompetencyTone,
   getCompetencyTodayDateKey,
-  isCompetencyAgendaVisible,
+  getVisibleSortedCompetencyAgendas,
   parseCompetencyDeadlineDate,
 } from "@/lib/competency-ui";
 
@@ -101,7 +100,7 @@ export function CompetencyHubClient({
 
   const todayDateKey = useMemo(() => getCompetencyTodayDateKey(), []);
   const visibleItems = useMemo(
-    () => items.filter((item) => isCompetencyAgendaVisible(item, todayDateKey)),
+    () => getVisibleSortedCompetencyAgendas(items, todayDateKey),
     [items, todayDateKey],
   );
   const yearOptions = useMemo(() => getYearOptions(visibleItems), [visibleItems]);
@@ -154,8 +153,7 @@ export function CompetencyHubClient({
           matchesUrgency &&
           matchesRecommendation
         );
-      })
-      .sort(compareAgendaByNearestDeadline);
+      });
   }, [
     categoryFilter,
     pricingFilter,

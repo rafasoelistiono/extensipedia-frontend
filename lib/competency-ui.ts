@@ -36,7 +36,7 @@ export function getCompetencyTodayDateKey(date = new Date()) {
 export function parseCompetencyDeadlineDate(
   deadlineDate: string,
 ): CompetencyDeadlineParts | null {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(deadlineDate);
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:[T ]|$)/.exec(deadlineDate);
 
   if (!match) {
     return null;

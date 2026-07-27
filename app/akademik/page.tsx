@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   CalendarDays,
   Download,
+  Play,
   ShieldAlert,
   Youtube,
 } from "lucide-react";
@@ -33,6 +34,29 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 120;
+
+const YOUTUBE_PLAYLISTS = [
+  {
+    id: "PLA_T0TC8QDR4",
+    title: "Manajemen Semua Materi",
+    image: "/academic/playlist-manajemen.webp",
+  },
+  {
+    id: "PLPTvH85dOcvc",
+    title: "Akuntansi Semua Materi",
+    image: "/academic/playlist-akuntansi.webp",
+  },
+  {
+    id: "PLV12rbA0Lw80",
+    title: "101 Skripsi Semester 6",
+    image: "/academic/playlist-101-skripsi.webp",
+  },
+  {
+    id: "PLIyr1UaUtnd4",
+    title: "Workshop Pengolahan Data",
+    image: "/academic/playlist-workshop-data.webp",
+  },
+] as const;
 
 type DigitalServiceCard = {
   key: string;
@@ -565,27 +589,40 @@ export default async function AkademikPage() {
               align="center"
             />
 
-            <div className="mx-auto mt-6 max-w-[1620px] overflow-hidden rounded-[20px] border border-panel-border bg-panel-bg shadow-[0_8px_28px_rgba(3,57,93,0.08)] sm:mt-10 sm:rounded-[28px]">
-              {youtubeSection?.embed_url ? (
-                <div className="aspect-video w-full">
-                  <iframe
-                    src={youtubeSection.embed_url}
-                    title={youtubeSection.title}
-                    className="h-full w-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-              ) : (
-                <div className="flex aspect-video items-center justify-center">
-                  <div className="flex flex-col items-center gap-4 text-copy-soft">
-                    <Youtube className="h-14 w-14 text-primary" />
-                    <p className="font-tagline text-[18px]">
-                      Playlist Youtube belum tersedia.
-                    </p>
+            <div className="mt-6 grid gap-6 sm:mt-10 sm:grid-cols-2">
+              {YOUTUBE_PLAYLISTS.map((playlist) => (
+                <a
+                  key={playlist.id}
+                  href={`https://www.youtube.com/playlist?list=${playlist.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block overflow-hidden rounded-[20px] border border-panel-border bg-panel-bg shadow-[0_8px_28px_rgba(3,57,93,0.08)] transition hover:-translate-y-1 hover:shadow-[0_14px_36px_rgba(3,57,93,0.16)] sm:rounded-[28px]"
+                >
+                  <div className="relative aspect-video w-full overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={playlist.image}
+                      alt={`Playlist ${playlist.title}`}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                    <span className="absolute inset-0 flex items-center justify-center opacity-0 transition duration-300 group-hover:opacity-100">
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/80">
+                        <Play className="ml-1 h-6 w-6 fill-white text-white" />
+                      </span>
+                    </span>
                   </div>
-                </div>
-              )}
+                  <div className="flex items-center justify-between gap-4 border-t border-panel-border bg-surface-subtle px-5 py-4">
+                    <p className="font-tagline text-[16px] font-bold text-primary sm:text-[18px]">
+                      {playlist.title}
+                    </p>
+                    <span className="flex shrink-0 items-center gap-2 font-tagline text-[14px] font-bold text-copy-soft transition group-hover:text-primary">
+                      <Youtube className="h-5 w-5" />
+                      Tonton di YouTube
+                    </span>
+                  </div>
+                </a>
+              ))}
             </div>
           </div>
         </section>

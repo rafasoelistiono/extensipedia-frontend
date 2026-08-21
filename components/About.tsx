@@ -22,7 +22,7 @@ const aboutGallery = [
   },
   {
     src: "/headers/header-kompetisi-karir.png",
-    alt: "Kegiatan kompetensi dan karir mahasiswa Program Ekstensi FEB UI",
+    alt: "Kegiatan kompetensi dan karier mahasiswa Program Ekstensi FEB UI",
   },
   {
     src: "/headers/header-advokasi.jpg",

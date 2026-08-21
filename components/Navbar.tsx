@@ -11,7 +11,7 @@ const navItems = [
   { label: "Tentang Kami", href: "/tentang-kami", match: "/tentang-kami" },
   { label: "Akademik", href: "/akademik", match: "/akademik" },
   {
-    label: "Kompetensi & Karir",
+    label: "Kompetensi & Karier",
     href: "/kompetensi-karir",
     match: "/kompetensi-karir",
   },

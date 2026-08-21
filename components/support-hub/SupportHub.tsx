@@ -193,7 +193,7 @@ export function SupportHub({
             <BreadcrumbTrail
               items={[
                 { label: "Beranda", href: "/" },
-                { label: "Kompetensi & Karir", href: "/kompetensi-karir" },
+                { label: "Kompetensi & Karier", href: "/kompetensi-karir" },
                 { label: isTicketTab ? "Lacak Tiket" : "Sampaikan Aspirasi" },
               ]}
             />

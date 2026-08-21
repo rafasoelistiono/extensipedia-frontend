@@ -12,7 +12,7 @@ import {
 } from "@/lib/public-api";
 
 export const metadata: Metadata = {
-  title: "Kompetensi & Karir Hub | Extensipedia",
+  title: "Kompetensi & Karier Hub | Extensipedia",
 };
 
 export const revalidate = 120;
@@ -47,12 +47,12 @@ export default async function KompetensiKarirPage() {
 
       <main>
         <HeroBanner
-          title="Kompetensi & Karir Hub"
-          description="Ekosistem terpadu untuk mengembangkan kompetensi akademik dan mengakselerasi perjalanan karirmu sebagai mahasiswa Ekstensi FEB UI."
+          title="Kompetensi & Karier Hub"
+          description="Ekosistem terpadu untuk mengembangkan kompetensi akademik dan mengakselerasi perjalanan kariermu sebagai mahasiswa Ekstensi FEB UI."
           backgroundImage="/headers/header-kompetisi-karir.png"
           breadcrumbs={[
             { label: "Beranda", href: "/" },
-            { label: "Kompetensi & Karir" },
+            { label: "Kompetensi & Karier" },
           ]}
           tabs={[
             {

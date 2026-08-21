@@ -80,7 +80,7 @@ const organizationMembers = [
   {
     name: "Cameliah Hamdani",
     role: "Kepala Departemen",
-    unit: "Pengembangan Karir",
+    unit: "Pengembangan Karier",
     image: "/about/Cameliah.PNG",
     instagram: "ameliahdni",
     linkedin: "https://www.linkedin.com/in/cameliahdni",
@@ -154,7 +154,7 @@ const kabinetValues = [
     letter: "C",
     title: "Cita",
     description:
-      "Fokus pada impian, target akademik, dan akselerasi karir mahasiswa yang ingin kami wujudkan.",
+      "Fokus pada impian, target akademik, dan akselerasi karier mahasiswa yang ingin kami wujudkan.",
     tone: "blue" as const,
   },
   {
@@ -422,7 +422,7 @@ export default async function TentangKamiPage() {
                 <p className="mt-6 max-w-[465px] font-tagline text-[17px] font-medium leading-[1.7] text-left text-base-white sm:mt-12 sm:text-[20px] sm:text-justify">
                   &quot;Mewujudkan BEM yang inklusif, responsif, dan kolaboratif
                   dalam menggemakan cita mahasiswa menuju kesuksesan akademik
-                  dan pengembangan karir.&quot;
+                  dan pengembangan karier.&quot;
                 </p>
               </article>
 

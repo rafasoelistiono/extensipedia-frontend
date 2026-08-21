@@ -38,7 +38,7 @@ export function Features({ items }: FeaturesProps) {
             const iconWrapperClass =
               index < 2
                 ? "bg-primary text-base-white"
-                : item.title === "Karir & Networking"
+                : item.title === "Karier & Networking"
                   ? "bg-[#EAF1FF] text-[#356AE6]"
                   : "bg-[#F8EDBF] text-[#D9A400]";
 

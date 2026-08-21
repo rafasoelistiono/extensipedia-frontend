@@ -54,10 +54,10 @@ const featureItems: FeatureItem[] = [
   },
   {
     icon: BriefcaseBusiness,
-    title: "Karir & Networking",
+    title: "Karier & Networking",
     description:
-      "Template CV, platform karir, dan resource library untuk akselerasi karirmu.",
-    details: ["CV & Cover Letter", "Platform Karir"],
+      "Template CV, platform karier, dan resource library untuk akselerasi kariermu.",
+    details: ["CV & Cover Letter", "Platform Karier"],
     action: "Lihat Resource",
     href: "/karir",
     activityKey: "home.features.career.view_resource",

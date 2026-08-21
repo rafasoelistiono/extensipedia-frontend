@@ -47,8 +47,8 @@ const programHubs = [
     ],
   },
   {
-    label: "Karir, Bisnis & Relasi",
-    fullLabel: "Karir, Bisnis & Relasi",
+    label: "Karier, Bisnis & Relasi",
+    fullLabel: "Karier, Bisnis & Relasi",
     department: "PENGKAR, BISMIT, EXTERN",
     programs: [
       {

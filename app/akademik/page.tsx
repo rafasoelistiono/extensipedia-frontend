@@ -163,6 +163,28 @@ function buildDigitalServiceCards(
   ]);
 
   return [
+    geminiHref
+      ? {
+          key: "gemini",
+          title:
+            getFirstFilledString(resources, [
+              "gemini_title",
+              "gemini_advanced_title",
+            ]) ?? "Google AI Plus Mahasiswa",
+          description:
+            getFirstFilledString(resources, [
+              "gemini_description",
+              "gemini_advanced_description",
+            ]) ??
+            "Klaim 12 bulan Google AI Plus tanpa biaya langsung dari Google: Gemini Omni, limit penggunaan 2x lebih tinggi, dan penyimpanan 400 GB.",
+          href: geminiHref,
+          actionLabel: "Klaim Sekarang",
+          borderColor: "#5182ed",
+          iconBackground: "#eff6ff",
+          actionBackground: "#000",
+          icon: "gemini",
+        }
+      : null,
     canvaHref
       ? {
           key: "canva",
@@ -186,28 +208,6 @@ function buildDigitalServiceCards(
           iconBackground: "#faf5ff",
           actionBackground: "linear-gradient(90deg, #823cf8 0%, #9747ff 100%)",
           icon: "canva",
-        }
-      : null,
-    geminiHref
-      ? {
-          key: "gemini",
-          title:
-            getFirstFilledString(resources, [
-              "gemini_title",
-              "gemini_advanced_title",
-            ]) ?? "Google AI Plus Mahasiswa",
-          description:
-            getFirstFilledString(resources, [
-              "gemini_description",
-              "gemini_advanced_description",
-            ]) ??
-            "Klaim 12 bulan Google AI Plus tanpa biaya langsung dari Google: Gemini Omni, limit penggunaan 2x lebih tinggi, dan penyimpanan 400 GB.",
-          href: geminiHref,
-          actionLabel: "Klaim Sekarang",
-          borderColor: "#5182ed",
-          iconBackground: "#eff6ff",
-          actionBackground: "#000",
-          icon: "gemini",
         }
       : null,
   ].filter((item): item is DigitalServiceCard => item !== null);

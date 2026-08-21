@@ -36,7 +36,7 @@ const getawayGroups = [
     items: [
       {
         name: "CDC UI",
-        description: "Pusat Karir Resmi UI",
+        description: "Pusat Karier Resmi UI",
         logoSrc: "/career/CDC%20UI%20LOGO.png",
         href: "https://cdc.ui.ac.id/",
       },
@@ -173,7 +173,7 @@ export default async function KarirPage() {
   );
   const stats = [
     { value: String(resources.length), label: "Resource Aktif" },
-    { value: String(platformCount), label: "Platform Karir" },
+    { value: String(platformCount), label: "Platform Karier" },
   ];
 
   return (
@@ -184,11 +184,11 @@ export default async function KarirPage() {
       <main>
         <HeroBanner
           title="Career Center"
-          description="Ekosistem resource dan shortcut karir untuk bantu mahasiswa Ekstensi FEB UI menyiapkan CV, portfolio, interview, dan akses ke platform kerja yang relevan."
+          description="Ekosistem resource dan shortcut karier untuk bantu mahasiswa Ekstensi FEB UI menyiapkan CV, portfolio, interview, dan akses ke platform kerja yang relevan."
           backgroundImage="/about/hero-bg.png"
           breadcrumbs={[
             { label: "Beranda", href: "/" },
-            { label: "Kompetensi & Karir", href: "/kompetensi-karir" },
+            { label: "Kompetensi & Karier", href: "/kompetensi-karir" },
             { label: "Career Center" },
           ]}
           tabs={[
@@ -277,7 +277,7 @@ export default async function KarirPage() {
             ) : (
               <div className="mt-8 rounded-[20px] border border-dashed border-panel-border bg-surface-subtle px-6 py-12 text-center">
                 <p className="font-headline text-[28px] text-primary">
-                  Resource karir belum tersedia.
+                  Resource karier belum tersedia.
                 </p>
                 <p className="mx-auto mt-3 max-w-[620px] text-[15px] leading-7 text-copy-soft">
                   Backend belum mengirimkan link resource aktif untuk CV, cover letter,
@@ -330,7 +330,7 @@ export default async function KarirPage() {
                 Career Getaway
               </h2>
               <p className="mt-3 max-w-[860px] font-body text-[15px] leading-7 text-copy-muted sm:text-[18px]">
-                Platform karir terpercaya yang dikurasi khusus untuk profil mahasiswa Ekstensi
+                Platform karier terpercaya yang dikurasi khusus untuk profil mahasiswa Ekstensi
                 FEB UI.
               </p>
             </div>
@@ -399,7 +399,7 @@ export default async function KarirPage() {
                     </h3>
                     <p className="mt-2 max-w-[760px] font-body text-[14px] leading-7 text-base-white/76">
                       Hubungi Departemen PENGKAR BEM PE FEB UI untuk request template atau
-                      konsultasi karir yang lebih spesifik.
+                      konsultasi karier yang lebih spesifik.
                     </p>
                   </div>
                 </div>

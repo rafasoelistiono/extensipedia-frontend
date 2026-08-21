@@ -195,15 +195,15 @@ function buildDigitalServiceCards(
             getFirstFilledString(resources, [
               "gemini_title",
               "gemini_advanced_title",
-            ]) ?? "Gemini Advanced",
+            ]) ?? "Google AI Plus Mahasiswa",
           description:
             getFirstFilledString(resources, [
               "gemini_description",
               "gemini_advanced_description",
             ]) ??
-            "Gabung slot family sharing untuk akses AI Gemini Advanced sebagai asisten riset dan belajar.",
+            "Klaim 12 bulan Google AI Plus tanpa biaya langsung dari Google: Gemini Omni, limit penggunaan 2x lebih tinggi, dan penyimpanan 400 GB.",
           href: geminiHref,
-          actionLabel: "Gabung Slot",
+          actionLabel: "Klaim Sekarang",
           borderColor: "#5182ed",
           iconBackground: "#eff6ff",
           actionBackground: "#000",

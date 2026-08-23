@@ -38,7 +38,7 @@ export function Hero() {
 
           <div className="mt-7 flex w-full flex-col items-center gap-3 sm:mt-8 sm:flex-row sm:justify-center">
             <Button
-              href="#akademik"
+              href="/akademik"
               variant="primary"
               className="min-h-[48px] w-full max-w-[320px] justify-center rounded-[18px] px-5 py-3 text-[14px] sm:w-auto sm:max-w-none"
               onClick={() =>
@@ -47,7 +47,7 @@ export function Hero() {
                   label: "Akses Bahan Kuliah",
                   target_type: "internal_link",
                   target_id: null,
-                  target_url: "#akademik",
+                  target_url: "/akademik",
                   metadata: { section: "hero", source: "homepage" },
                 })
               }

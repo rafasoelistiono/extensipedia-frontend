@@ -58,6 +58,13 @@ const YOUTUBE_PLAYLISTS = [
   },
 ] as const;
 
+const ACADEMIC_RADARS = [
+  { label: "Manajemen 2024", href: "https://bit.ly/radarxman24" },
+  { label: "Manajemen 2025", href: "https://bit.ly/radarxman25" },
+  { label: "Akuntansi 2024", href: "https://bit.ly/radarxact24" },
+  { label: "Akuntansi 2025", href: "https://bit.ly/radarxact25" },
+] as const;
+
 type DigitalServiceCard = {
   key: string;
   title: string;
@@ -429,6 +436,33 @@ export default async function AkademikPage() {
                 items={mapRepositoryItems(repository.manajemen)}
                 tone="blue"
               />
+            </div>
+
+            <div className="mt-4 rounded-[20px] border border-panel-border bg-base-white p-5 shadow-[0_4px_17px_rgba(0,0,0,0.08)] sm:mt-6 sm:p-7">
+              <p className="font-body text-[12px] uppercase tracking-[0.08em] text-copy-soft">
+                Academic Radar
+              </p>
+              <h3 className="mt-1 font-tagline text-[18px] text-primary sm:text-[20px]">
+                Rekap materi, tugas, dan jadwal per angkatan
+              </h3>
+              <p className="mt-2 font-body text-[14px] leading-6 text-copy-soft">
+                Spreadsheet berjalan yang dirawat tiap angkatan. Login pakai email
+                yang kamu daftarkan saat PSAF.
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {ACADEMIC_RADARS.map((radar) => (
+                  <a
+                    key={radar.href}
+                    href={radar.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-between gap-3 rounded-[12px] border border-panel-border px-4 py-3 font-tagline text-[15px] text-primary transition hover:border-primary/40 hover:bg-surface-subtle"
+                  >
+                    {radar.label}
+                    <ArrowMark />
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         </section>

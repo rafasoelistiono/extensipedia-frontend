@@ -375,22 +375,34 @@ export default async function AkademikPage() {
                     Penting
                   </div>
                   <div className="font-tagline text-[18px] text-primary sm:text-[20px]">
-                    Disclaimer Internal
+                    Akses &amp; Ketentuan
                   </div>
                 </div>
               </div>
 
               <div className="mt-5 rounded-[10px] border border-cta bg-primary p-4 sm:mt-6 sm:p-5">
                 <p className="font-tagline text-[13px] leading-5 text-base-white sm:text-[14px]">
-                  Materi ini hanya untuk kepentingan internal akademik mahasiswa
-                  Ekstensi FEB UI. Dilarang keras mendistribusikan atau
-                  menggunakan untuk kepentingan komersial.
+                  Drive &amp; Academic Radar angkatan 2024–2025 terbuka untuk
+                  seluruh mahasiswa Ekstensi. Login pakai email yang kamu
+                  daftarkan saat PSAF. Belum bisa masuk? Klik tombol Minta akses
+                  pakai email @ui.ac.id kamu.
                 </p>
               </div>
 
-              <ul className="mt-5 list-disc space-y-1 pl-5 font-tagline text-[14px] text-primary sm:mt-6 sm:text-[15px]">
-                <li>Gunakan hanya untuk keperluan belajar pribadi</li>
-                <li>Hargai karya intelektual dosen dan rekan mahasiswa</li>
+              <p className="mt-3 rounded-[10px] border border-dashed border-primary/40 px-3 py-2 font-tagline text-[13px] leading-5 text-primary sm:text-[14px]">
+                Angkatan 2026: Drive &amp; Academic Radar dibuat setelah ketua
+                angkatan terpilih.
+              </p>
+
+              <ul className="mt-4 list-disc space-y-1 pl-5 font-tagline text-[14px] text-primary sm:mt-5 sm:text-[15px]">
+                <li>
+                  Materi hanya untuk kepentingan internal akademik mahasiswa
+                  Ekstensi FEB UI
+                </li>
+                <li>
+                  Dilarang mendistribusikan atau memakai untuk kepentingan
+                  komersial
+                </li>
                 <li>Laporkan penyalahgunaan ke tim DIKTI</li>
               </ul>
             </article>

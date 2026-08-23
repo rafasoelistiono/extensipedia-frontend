@@ -121,7 +121,7 @@ export function About({ title, description }: AboutProps) {
 
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <Button
-                  href="#akademik"
+                  href="/akademik"
                   variant="primary"
                   className="justify-center sm:px-5"
                   onClick={() =>
@@ -130,7 +130,7 @@ export function About({ title, description }: AboutProps) {
                       label: "Akses Bahan Kuliah",
                       target_type: "internal_link",
                       target_id: null,
-                      target_url: "#akademik",
+                      target_url: "/akademik",
                       metadata: { section: "about", source: "homepage" },
                     })
                   }
